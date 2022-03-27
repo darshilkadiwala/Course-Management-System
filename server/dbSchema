@@ -1,0 +1,140 @@
+
+Table "tblCity" {
+  "CityID" int [pk, not null]
+  "StateID" int [not null]
+  "CityName" char(100) [not null]
+}
+
+Table "tblState" {
+  "StateID" int [pk, not null]
+  "StateName" char(70) [not null]
+}
+
+Table "tblUserDetails" {
+  "UserID" int [pk, not null]
+  "LoginID" int [not null]
+  "CityID" int [not null]
+  "FirstName" char(30) [not null]
+  "LastName" char(30) [not null]
+  "ContactNumber" Bigint [unique, not null]
+  "EmailId" varchar(255) [unique, not null]
+  "Gender" char(1) [not null]
+  "ProfilePicture" varbinary [not null]
+  "Username" char(30) [unique, not null]
+  "Password" varchar(255) [not null]
+  "UserStatus" char(1) [not null]
+  "AccountStatus" char(1) [not null]
+  "Role" char(12) [not null]
+}
+
+Table "tblInstrctorDetails" {
+  "IntructorId" int [pk, not null]
+  "UserId" int [not null]
+  "Headline" char(100) [not null]
+  "Biography" varchar(255) [not null]
+  "LinkedInProfileUrl" char(100) [not null]
+}
+
+Table "tblCourseCategory" {
+  "CourseCategoryID" int [pk, not null]
+  "CategoryName" char(30) [not null]
+  "ShortDescription" char(100) [not null]
+  "CategoryStatus" char(1) [not null]
+}
+
+Table "tblCourseSubcategory" {
+  "CourseSubcategoryID" int [pk, not null]
+  "CourseCategoryID" int [not null]
+  "SubCategoryName" char(30) [not null]
+  "ShortDescription" char(100) [not null]
+  "SubcategoryStatus" char(1) [not null]
+}
+
+Table "tblCourseBasicDetails" {
+  "CourseID" int [pk, not null]
+  "InstructorID" int [not null]
+  "CourseSubcategoryID" int [not null]
+  "CourseTitle" char(100) [not null]
+  "CourseSubTitle" varchar(255) [not null]
+  "Description" varchar(255) [not null]
+  "Language" char(30) [not null]
+  "CourseLevel" char(12) [not null]
+  "CourseImage" varbinary [not null]
+  "CourseOutcomes" varchar(255) [not null]
+  "CourseRequirements" varchar(255) [not null]
+  "CourseFor" varchar(255) [not null]
+  "CourseStatus" char(1) [not null]
+}
+
+Table "tblCourseSectionDetails" {
+  "CourseSectionID" int [pk, not null]
+  "CourseID" int [not null]
+  "SectionName" char(30) [not null]
+}
+
+Table "tblCourseLectureDetails" {
+  "CourseLectureID" int [pk, not null]
+  "CourseSectionID" int [not null]
+  "LectureName" char(30) [not null]
+  "LectureVideo" binary [not null]
+  "LectureNotes" binary [not null]
+  "lectureMaterial" binary [not null]
+}
+
+Table "tblCourseEnrollmentDetails" {
+  "CourseEnrollmentID" int [pk, not null]
+  "CourseID" int [not null]
+  "StudentID" int [not null]
+  "EnrollmentDateTime" DateTime [not null]
+}
+
+Table "tblCourseProgressDetails" {
+  "CourseProgressID" int [pk, not null]
+  "CourseEnrollmentID" int [not null]
+  "CourseLectureID" int [not null]
+}
+
+Table "tblFeedback" {
+  "FeedbackID" int [pk, not null]
+  "CourseEnrollmentID" int [not null]
+  "Rating" float [not null]
+  "Description" varchar(255) [not null]
+}
+
+Table "tblContactInquiry" {
+  "InquiryID" int [pk, not null]
+  "FirstName" char(30) [not null]
+  "LastName" char(30) [not null]
+  "ContactNUmber" Bigint [not null]
+  "EmailId" varchar(255) [not null]
+  "InquiryDetail" varchar(255) [not null]
+  "InquiryDate" date [not null]
+}
+
+Ref:"tblRole"."RoleID" < "tblLoginDetails"."RoleID"
+
+Ref:"tblState"."StateID" < "tblCity"."StateID"
+
+Ref:"tblLoginDetails"."LoginID" < "tblUserDetails"."LoginID"
+
+Ref:"tblCity"."CityID" < "tblUserDetails"."CityID"
+
+Ref:"tblUserDetails"."UserID" < "tblInstrctorDetails"."UserId"
+
+Ref:"tblCourseCategory"."CourseCategoryID" < "tblCourseSubcategory"."CourseCategoryID"
+
+Ref:"tblInstrctorDetails"."IntructorId" < "tblCourseBasicDetails"."InstructorID"
+
+Ref:"tblCourseSubcategory"."CourseSubcategoryID" < "tblCourseBasicDetails"."CourseSubcategoryID"
+
+Ref:"tblCourseBasicDetails"."CourseID" < "tblCourseSectionDetails"."CourseID"
+
+Ref:"tblCourseSectionDetails"."CourseSectionID" < "tblCourseLectureDetails"."CourseSectionID"
+
+Ref:"tblCourseBasicDetails"."CourseID" < "tblCourseEnrollmentDetails"."CourseID"
+
+Ref:"tblCourseEnrollmentDetails"."CourseEnrollmentID" < "tblCourseProgressDetails"."CourseEnrollmentID"
+
+Ref:"tblCourseLectureDetails"."CourseLectureID" < "tblCourseProgressDetails"."CourseLectureID"
+
+Ref:"tblCourseEnrollmentDetails"."CourseEnrollmentID" < "tblFeedback"."CourseEnrollmentID"
