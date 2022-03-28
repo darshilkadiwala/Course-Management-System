@@ -10,22 +10,22 @@ Table "tblState" {
   "StateName" char(70) [not null]
 }
 
-Table "tblUserDetails" {
-  "UserID" int [pk, not null]
-  "LoginID" int [not null]
-  "CityID" int [not null]
-  "FirstName" char(30) [not null]
-  "LastName" char(30) [not null]
-  "ContactNumber" Bigint [unique, not null]
-  "EmailId" varchar(255) [unique, not null]
-  "Gender" char(1) [not null]
-  "ProfilePicture" varbinary [not null]
-  "Username" char(30) [unique, not null]
-  "Password" varchar(255) [not null]
-  "UserStatus" char(1) [not null]
-  "AccountStatus" char(1) [not null]
-  "Role" char(12) [not null]
-}
+# Table "tblUserDetails" {
+#   "UserID" int [pk, not null]
+#   "LoginID" int [not null]
+#   "CityID" int [not null]
+#   "FirstName" char(30) [not null]
+#   "LastName" char(30) [not null]
+#   "ContactNumber" Bigint [unique, not null]
+#   "EmailId" varchar(255) [unique, not null]
+#   "Gender" char(1) [not null]
+#   "ProfilePicture" varbinary [not null]
+#   "Username" char(30) [unique, not null]
+#   "Password" varchar(255) [not null]
+#   "UserStatus" char(1) [not null]
+#   "AccountStatus" char(1) [not null]
+#   "Role" char(12) [not null]
+# }
 
 Table "tblInstrctorDetails" {
   "IntructorId" int [pk, not null]
