@@ -1,6 +1,6 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middlewares/asyncHandler");
-const UserModel = require("../models/UserDetailSchema");
+const UserDetailSchema = require("../models/UserDetailSchema");
 
 //#region Login User
 /**
@@ -17,7 +17,9 @@ exports.loginController = asyncHandler(async (req, res, next) => {
 			new ErrorResponse(400, "Please provide a valid email and password")
 		);
 	}
-	const userModel = await UserModel.findOne({ username }).select("+password");
+	const userModel = await UserDetailSchema.findOne({ username }).select(
+		"+password"
+	);
 	if (!userModel) {
 		statusCode = 401;
 		return next(new ErrorResponse(statusCode, `Invalid credentials`));
@@ -44,7 +46,7 @@ exports.loginController = asyncHandler(async (req, res, next) => {
  * @param access	PUBLIC
  */
 exports.registerController = asyncHandler(async (req, res, next) => {
-	let statusCode = 200;
+	let statusCode = 201;
 	const {
 		firstName,
 		lastName,
@@ -55,7 +57,7 @@ exports.registerController = asyncHandler(async (req, res, next) => {
 		gender,
 		profilePicture,
 	} = req.body;
-	const userModel = await UserModel.create({
+	const userModel = await UserDetailSchema.create({
 		firstName,
 		lastName,
 		contactNumber,
@@ -89,8 +91,7 @@ exports.registerController = asyncHandler(async (req, res, next) => {
  **/
 exports.getMe = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
-	console.log("user not found");
-	const user = await UserModel.findById(req.user.id);
+	const user = await UserDetailSchema.findById(req.user.id);
 	if (!user) {
 		console.log("user not found");
 	}

@@ -8,8 +8,9 @@ const fileUpload = require("express-fileupload");
 const dbConnection = require("./config/dbConnection");
 const cookieParser = require("cookie-parser");
 // TODO: require all routes file here
-const authRoutes = require("./routes/authRoutes");
 const errorHandler = require("./middlewares/errorHandler");
+const authRoutes = require("./routes/authRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 const app = express();
 
@@ -25,13 +26,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload({ createParentPath: true }));
 app.use(cookieParser());
-// Mount Routes
-//TODO: add routes here
-app.use("/api/v1/auth", authRoutes);
 
 // Connecting Mongo Database
 console.log("Connecting to mongodb ...");
 dbConnection();
+
+// Mount Routes
+//TODO: add routes here
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/category", categoryRoutes);
 
 // Handling errors
 app.use(errorHandler);
