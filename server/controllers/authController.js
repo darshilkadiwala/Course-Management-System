@@ -93,7 +93,8 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
 	const user = await UserDetailSchema.findById(req.user.id);
 	if (!user) {
-		console.log("user not found");
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't find user`));
 	}
 	res.status(statusCode).json({
 		success: true,

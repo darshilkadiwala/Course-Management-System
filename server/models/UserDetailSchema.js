@@ -14,7 +14,7 @@ const UserDetailSchema = new mongoose.Schema(
 			trim: true,
 		},
 		contactNumber: {
-			type: mongoose.SchemaTypes.Number,
+			type: mongoose.Schema.Types.Number,
 			unique: true,
 			required: [true, "Please add your contact number"],
 			validate: {
