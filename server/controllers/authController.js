@@ -1,6 +1,6 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middlewares/asyncHandler");
-const UserDetailSchema = require("../models/UserDetailSchema");
+const UserDetailSchema = require("../models/UserDetailSchema.model");
 
 //#region Login User
 /**

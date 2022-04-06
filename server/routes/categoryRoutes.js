@@ -10,8 +10,8 @@ const {
 } = require("../controllers/categoryController");
 const categoryRouter = express.Router({ mergeParams: true });
 const advancedResult = require("../middlewares/advancedResult");
-const CategorySchema = require("../models/CategorySchema");
-const SubcategorySchema = require("../models/SubcategorySchema");
+const CategorySchema = require("../models/CategorySchema.model");
+const SubcategorySchema = require("../models/SubcategorySchema.model");
 
 //Root route : /api/v1/category/
 //TODO: require routes controller here
@@ -19,7 +19,11 @@ const SubcategorySchema = require("../models/SubcategorySchema");
 categoryRouter
 	.route("/")
 	.get(
-		advancedResult(CategorySchema, "subcategories", "category"),
+		advancedResult(
+			CategorySchema,
+			"subcategories",
+			"_id subcategoryName desc slug"
+		),
 		getAllCategoryController
 	)
 	.post(addNewCategoryController);
@@ -27,18 +31,16 @@ categoryRouter
 categoryRouter
 	.route("/:categoryNameSlug")
 	.get(
-		advancedResult(CategorySchema, {
-			path: "subcategory",
-		}),
+		advancedResult(CategorySchema, "subcategories"),
 		getSingleCategoryController
 	)
-	.put(updateCategoryController)
-	.delete(deleteCategoryController);
+	.put(updateCategoryController);
+// .delete(deleteCategoryController);
 
 categoryRouter
 	.route("/:categoryNameSlug/subcategory/")
 	.get(
-		advancedResult(SubcategorySchema, { path: "categories" }, "subcategory"),
+		advancedResult(SubcategorySchema, "category", "_id categoryName desc slug"),
 		getAllSubcategoryByCategoryController
 	)
 	.post(addNewSubCategoryController);

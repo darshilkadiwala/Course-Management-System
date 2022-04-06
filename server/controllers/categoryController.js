@@ -1,7 +1,10 @@
 const asyncHandler = require("../middlewares/asyncHandler");
 const ErrorResponse = require("../utils/errorResponse");
-const CategorySchema = require("../models/CategorySchema");
-const SubcategorySchema = require("../models/SubcategorySchema");
+const CategorySchema = require("../models/CategorySchema.model");
+const SubcategorySchema = require("../models/SubcategorySchema.model");
+const advancedResult = require("../middlewares/advancedResult");
+
+//#region category controllers
 
 //#region Get all category
 /** Get all category
@@ -10,6 +13,7 @@ const SubcategorySchema = require("../models/SubcategorySchema");
  * @param access    PUBLIC
  */
 exports.getAllCategoryController = asyncHandler(async (req, res, next) => {
+	//#region
 	// let statusCode = 200;
 	// const reqQuery = { ...req.query };
 	// const removeFields = ["select", "sort", "page", "limit", "pagination"];
@@ -98,7 +102,8 @@ exports.getAllCategoryController = asyncHandler(async (req, res, next) => {
 	// 	success: true,
 	// 	...advancedResult,
 	// });
-	// //#endregion
+	//
+	//#endregion
 
 	res
 		.status(res.advancedResult.statusCode)
@@ -174,11 +179,12 @@ exports.addNewCategoryController = asyncHandler(async (req, res, next) => {
 		categoryName,
 		desc,
 	});
-
+	console.log("From categoryController : " + categoryModel);
 	if (!categoryModel) {
 		statusCode = 404;
 		return next(new ErrorResponse(statusCode, `Can't add new category`));
 	}
+
 	const msg = "New Category added !!!";
 	// const token = userModel.getSignedJWTToken();
 	res.status(statusCode).json({
@@ -220,7 +226,7 @@ exports.updateCategoryController = asyncHandler(async (req, res, next) => {
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		msg: "Category updated",
+		msg: "Category details updated successfully",
 		data: updateCategoryModel,
 	});
 	//#endregion
@@ -260,6 +266,10 @@ exports.deleteCategoryController = asyncHandler(async (req, res, next) => {
 });
 //#endregion
 
+//#endregion
+
+//#region Subcategory contollers
+
 //#region Get all subcategory by category
 /** Get all subcategory by category
  * @param desc      Get all subcategory by category
@@ -268,9 +278,11 @@ exports.deleteCategoryController = asyncHandler(async (req, res, next) => {
  */
 exports.getAllSubcategoryByCategoryController = asyncHandler(
 	async (req, res, next) => {
-		res
-			.status(res.advancedResult.statusCode)
-			.json({ success: true, msg: "All subcategory", ...res.advancedResult });
+		res.status(res.advancedResult.statusCode).json({
+			success: true,
+			msg: `All subcategory for category : ${req.params.categoryNameSlug}`,
+			...res.advancedResult,
+		});
 	}
 );
 //#endregion
@@ -320,4 +332,6 @@ exports.addNewSubCategoryController = asyncHandler(async (req, res, next) => {
 	});
 	//#endregion
 });
+//#endregion
+
 //#endregion

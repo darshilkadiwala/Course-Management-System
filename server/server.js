@@ -3,12 +3,12 @@ const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
-
 const fileUpload = require("express-fileupload");
-const dbConnection = require("./config/dbConnection");
 const cookieParser = require("cookie-parser");
-// TODO: require all routes file here
+
+const dbConnection = require("./config/dbConnection");
 const errorHandler = require("./middlewares/errorHandler");
+// TODO: require all routes file here
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 

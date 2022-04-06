@@ -1,5 +1,6 @@
+const SubcategorySchema = require("../models/SubcategorySchema.model");
 const advancedResult =
-	(model, populate = undefined, localField = undefined) =>
+	(model, populate = undefined, select = undefined) =>
 	async (req, res, next) => {
 		let statusCode = 200;
 		const reqQuery = { ...req.query };
@@ -37,6 +38,7 @@ const advancedResult =
 			  }
 			: { __v: false };
 		usersProjection["createdAt"] = isCreatedAt;
+
 		let modelQuery = model.find(queryParams, usersProjection);
 		//#endregion
 
@@ -54,9 +56,11 @@ const advancedResult =
 		} else {
 			modelQuery = modelQuery.sort("createdAt");
 		}
-		const totalDocuments = await model.countDocuments(queryParams);
+		console.log("______________________________________");
+		const totalDocuments = await model.countDocuments();
+		console.log(queryParams);
 		if (!totalDocuments) {
-			return next(new ErrorResponse(404, `Can't find any resourses`));
+			next(new ErrorResponse(204, `Can't find any resourses`));
 		}
 		//#endregion
 
@@ -80,9 +84,13 @@ const advancedResult =
 		}
 		//#endregion
 
-		if (isPopulate) {
-			modelQuery = modelQuery.populate(populate);
+		if (isPopulate && populate) {
+			modelQuery = modelQuery.populate({
+				path: populate,
+				select,
+			});
 		}
+
 		const results = await modelQuery;
 		//#region Sending result
 		res.advancedResult = {
@@ -90,7 +98,7 @@ const advancedResult =
 			data: results,
 		};
 		if (isPagination) {
-			res.advancedResult.totalDocuments = totalDocuments;
+			res.advancedResult.totalDocuments = totalDocuments ? totalDocuments : 0;
 			res.advancedResult.pagination = pagination;
 			res.advancedResult.count = results.length;
 		}

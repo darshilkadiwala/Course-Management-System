@@ -38,9 +38,9 @@ const ErrorHandler = (err, req, res, next) => {
 			});
 		} else if (err.name === "TypeError") {
 			console.log(Object.keys(err));
-			// Object.entries(err).forEach(function (key) {
-			// 	console.log(key);
-			// });
+			Object.entries(err).forEach(function (key) {
+				console.log(key);
+			});
 		}
 		error = new ErrorResponse(400, JSON.stringify(message));
 	}

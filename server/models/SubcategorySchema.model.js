@@ -1,5 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const { default: slugify } = require("slugify");
+const ErrorResponse = require("../utils/errorResponse");
+const CategorySchema = require("./CategorySchema.model");
 const SubcategoryDetailSchema = new mongoose.Schema({
 	subcategoryName: {
 		type: String,
@@ -28,8 +30,18 @@ const SubcategoryDetailSchema = new mongoose.Schema({
 		],
 	},
 });
+
 SubcategoryDetailSchema.pre("save", async function (next) {
 	this.slug = slugify(this.subcategoryName, { lower: true, replacement: "-" });
+	const categoryModel = await CategorySchema.findOneAndUpdate(
+		{
+			_id: this.category,
+		},
+		{ $push: { subcategories: this._id } }
+	);
+	if (!categoryModel) {
+		return next(new ErrorResponse(404, `Can't add new subcategory`));
+	}
 	next();
 });
 module.exports = mongoose.model("Subcategory", SubcategoryDetailSchema);

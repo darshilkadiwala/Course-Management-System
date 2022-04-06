@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const UserModel = require("../models/UserDetailSchema");
+const UserModel = require("../models/UserDetailSchema.model");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("./asyncHandler");
 
@@ -22,7 +22,6 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
 	//Make sure token exists
 	if (!token) {
-		console.log("token not found");
 		return next(new ErrorResponse(401, "Not Autorized to access this route"));
 	} else {
 		try {

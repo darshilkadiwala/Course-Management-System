@@ -22,7 +22,7 @@ const CategoryDetailSchema = new mongoose.Schema(
 			type: Date,
 			default: Date.now,
 		},
-		subcategory: [
+		subcategories: [
 			{
 				type: mongoose.Types.ObjectId,
 				ref: "Subcategory",
@@ -47,10 +47,10 @@ CategoryDetailSchema.pre("save", async function (next) {
 // });
 
 // Reverse populate with virtuals
-// CategoryDetailSchema.virtual("subcategory", {
-// 	ref: "Subcategory",
-// 	foreignField: "category",
-// 	localField: "id",
-// 	justOne: false,
-// });
+CategoryDetailSchema.virtual("subcategory", {
+	ref: "Subcategory",
+	foreignField: "category",
+	localField: "id",
+	justOne: false,
+});
 module.exports = mongoose.model("Category", CategoryDetailSchema);
