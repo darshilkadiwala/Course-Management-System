@@ -2,7 +2,6 @@ const asyncHandler = require("../middlewares/asyncHandler");
 const ErrorResponse = require("../utils/errorResponse");
 const CategorySchema = require("../models/CategorySchema.model");
 const SubcategorySchema = require("../models/SubcategorySchema.model");
-const advancedResult = require("../middlewares/advancedResult");
 
 //#region category controllers
 
@@ -13,98 +12,9 @@ const advancedResult = require("../middlewares/advancedResult");
  * @param access    PUBLIC
  */
 exports.getAllCategoryController = asyncHandler(async (req, res, next) => {
-	//#region
-	// let statusCode = 200;
-	// const reqQuery = { ...req.query };
-	// const removeFields = ["select", "sort", "page", "limit", "pagination"];
-	// removeFields.forEach((param) => delete reqQuery[param]);
-
-	// //#region fetching query from request
-	// let queryString = JSON.stringify(reqQuery);
-	// queryString = queryString.replace(
-	// 	/\b(gt|gte|lt|lte|in)\b/g,
-	// 	(match) => `$${match}`
-	// );
-
-	// let queryParams = JSON.parse(queryString);
-	// const isID = req.query.id === "true" ? true : false;
-	// const isCreatedAt = req.query.createdAt === "true" ? true : false;
-	// var usersProjection = !isID
-	// 	? {
-	// 			_id: false,
-	// 			__v: false,
-	// 	  }
-	// 	: { __v: false };
-	// usersProjection["createdAt"] = isCreatedAt;
-	// let categoryModelQuery = CategorySchema.find(queryParams, usersProjection);
-	// //#endregion
-
-	// //#region selecting & sorting fields and counting totalDocuments
-	// // selecting fields
-	// if (req.query.select) {
-	// 	const fields = req.query.select.split(",").join(" ");
-	// 	categoryModelQuery = categoryModelQuery.select(fields);
-	// }
-	// // sorting fields
-	// if (req.query.sort) {
-	// 	const sortBy = req.query.sort.split(",").join(" ");
-	// 	categoryModelQuery = categoryModelQuery.sort(sortBy);
-	// } else {
-	// 	categoryModelQuery = categoryModelQuery.sort("createdAt");
-	// }
-	// // counting totalDocuments
-	// const totalDocuments = await CategorySchema.countDocuments(queryParams);
-	// //#endregion
-
-	// //#region pagination
-	// const isPagination = req.query.pagination === "true" ? true : false;
-	// const pagination = undefined;
-	// if (isPagination) {
-	// 	pagination = {};
-	// 	const page = parseInt(req.query.page, 10) || 1;
-	// 	const limit = parseInt(req.query.limit, 10) || 5;
-	// 	const startIndex = (page - 1) * limit;
-	// 	const endIndex = page * limit;
-	// 	if (endIndex < totalDocuments) {
-	// 		pagination.next = { page: page + 1, limit };
-	// 	}
-	// 	if (startIndex > 0) {
-	// 		pagination.prev = { page: page - 1, limit };
-	// 	}
-	// 	// fetching category with limits
-	// 	categoryModelQuery = categoryModelQuery.skip(startIndex).limit(limit);
-	// }
-	// //#endregion pagination
-
-	// //#region populate subcategory
-	// // if (populate) {
-	// // categoryModelQuery = categoryModelQuery.populate("Subcategory");
-	// // }
-	// //#endregion
-
-	// //#region Executing result and sending response
-	// const results = await categoryModelQuery;
-
-	// const advancedResult = {
-	// 	statusCode,
-	// 	data: results,
-	// };
-	// if (pagination) {
-	// 	advancedResult.totalDocuments = totalDocuments;
-	// 	advancedResult.pagination = pagination;
-	// 	advancedResult.count = results.length;
-	// }
-
-	// if (!totalDocuments) {
-	// 	return next(new ErrorResponse(404, `Can't find any resourses`));
-	// }
-	// res.status(advancedResult.statusCode).json({
-	// 	success: true,
-	// 	...advancedResult,
-	// });
-	//
-	//#endregion
-
+	res.advancedResult.data.sort(function (category1, category2) {
+		return category1.categoryName.localeCompare(category2.categoryName);
+	});
 	res
 		.status(res.advancedResult.statusCode)
 		.json({ success: true, msg: "All category", ...res.advancedResult });
@@ -135,9 +45,9 @@ exports.getSingleCategoryController = asyncHandler(async (req, res, next) => {
 	const isCreatedAt = req.query.createdAt === "true" ? true : false;
 	var usersProjection = !isID
 		? {
-				_id: false,
-				__v: false,
-		  }
+			_id: false,
+			__v: false,
+		}
 		: { __v: false };
 	usersProjection["createdAt"] = isCreatedAt;
 	let categoryModelQuery = CategorySchema.find(
@@ -168,9 +78,9 @@ exports.getSingleCategoryController = asyncHandler(async (req, res, next) => {
 
 //#region Add new category
 /** Add new category
- * @param desc      Add new category
+ * @param desc			Add new category
  * @param route		POST -> /api/v1/category/
- * @param access    PRIVATE
+ * @param access		PRIVATE
  */
 exports.addNewCategoryController = asyncHandler(async (req, res, next) => {
 	let statusCode = 201;
@@ -223,6 +133,7 @@ exports.updateCategoryController = asyncHandler(async (req, res, next) => {
 			)
 		);
 	}
+
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
@@ -285,6 +196,101 @@ exports.getAllSubcategoryByCategoryController = asyncHandler(
 		});
 	}
 );
+//#endregion
+
+//#region Get single subcategory by slug
+/** Get single subcategory by slug
+ * @param desc      Get single subcategory by slug
+ * @param route     GET -> /api/v1/category/:categoryNameSlug/subcategory/:subcategoryNameSlug
+ * @param access    PUBLIC
+ */
+exports.getSinglesubcategoryController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	const reqQuery = { ...req.query };
+	const removeFields = ["select", "sort", "page", "limit", "pagination"];
+	removeFields.forEach((param) => delete reqQuery[param]);
+	const subcategoryNameSlug = req.params.subcategoryNameSlug;
+
+	//#region fetching query from request
+	let queryString = JSON.stringify(reqQuery);
+	queryString = queryString.replace(
+		/\b(gt|gte|lt|lte|in)\b/g,
+		(match) => `$${match}`
+	);
+	let queryParams = JSON.parse(queryString);
+	const isID = req.query.id === "true" ? true : false;
+	const isCreatedAt = req.query.createdAt === "true" ? true : false;
+	var usersProjection = !isID
+		? {
+			_id: false,
+			__v: false,
+		}
+		: { __v: false };
+	usersProjection["createdAt"] = isCreatedAt;
+	let subcategoryModelQuery = SubcategorySchema.find(
+		{ ...queryParams, slug: subcategoryNameSlug },
+		usersProjection
+	);
+	//#endregion
+
+	//#region Executing result and sending response
+	const results = await subcategoryModelQuery;
+	if (Object.keys(results).length == 0) {
+		statusCode = 404;
+		return next(
+			new ErrorResponse(
+				statusCode,
+				`Can't find resourse (name: ${subcategoryNameSlug})`
+			)
+		);
+	}
+	res.status(statusCode).json({
+		success: true,
+		statusCode,
+		data: results,
+	});
+	//#endregion
+});
+//#endregion
+
+//#region Update subcategory
+/** Update subcategory
+ * @param desc      Update subcategory
+ * @param route     PUT -> /api/v1/category/:categoryNameSlug/subcategory/:subcategoryNameSlug/
+ * @param access    PRIVATE
+ */
+exports.updateSubcategoryController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	const categoryNameSlug = req.params.categoryNameSlug;
+	const subcategoryNameSlug = req.params.subcategoryNameSlug;
+	console.log(req.params);
+	// //#region Updating subcategory
+	// const updateSubcategoryModel = await SubcategorySchema.findOneAndUpdate(
+	// 	{ slug: subcategoryNameSlug },
+	// 	{ subcategoryName: req.body.subcategoryName, desc: req.body.desc },
+	// 	{ new: true, runValidators: true }
+	// );
+	// //#endregion
+
+	// //#region Sending response
+	// if (!updateSubcategoryModel) {
+	// 	statusCode = 404;
+	// 	return next(
+	// 		new ErrorResponse(
+	// 			statusCode,
+	// 			`Can't update details (name : \'${subcategoryNameSlug}\')`
+	// 		)
+	// 	);
+	// }
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		msg: "Subcategory details updated successfully",
+		data: updateSubcategoryModel,
+	});
+	//#endregion
+});
 //#endregion
 
 //#region Add new subcategory to category

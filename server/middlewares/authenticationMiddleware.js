@@ -3,7 +3,6 @@ const UserModel = require("../models/UserDetailSchema.model");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("./asyncHandler");
 
-//
 //#region Protect routes
 /** Protect routes
  * @param desc		Protect routes
@@ -27,9 +26,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 		try {
 			//Verify token
 			const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-			console.log(decodedToken);
 			req.user = await UserModel.findById(decodedToken.id);
-			console.log(req.user);
 			next();
 		} catch (error) {
 			return next(new ErrorResponse(401, "Not Autorized to access this route"));
@@ -46,7 +43,7 @@ exports.authorize = (...roles) => {
 	return (req, res, next) => {
 		if (!roles.includes(req.user.role)) {
 			return next(
-				new ErrorResponse(403, `User role ${req.user.role} is unauthorized `)
+				new ErrorResponse(403, `${req.user.role} is unauthorized to do this task`)
 			);
 		}
 		next();
