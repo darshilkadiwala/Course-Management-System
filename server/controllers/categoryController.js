@@ -29,35 +29,33 @@ exports.getAllCategoryController = asyncHandler(async (req, res, next) => {
  */
 exports.getSingleCategoryController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
-	const reqQuery = { ...req.query };
-	const removeFields = ["select", "sort", "page", "limit", "pagination"];
-	removeFields.forEach((param) => delete reqQuery[param]);
 	const categoryNameSlug = req.params.categoryNameSlug;
-
-	//#region fetching query from request
-	let queryString = JSON.stringify(reqQuery);
-	queryString = queryString.replace(
-		/\b(gt|gte|lt|lte|in)\b/g,
-		(match) => `$${match}`
-	);
-	let queryParams = JSON.parse(queryString);
-	const isID = req.query.id === "true" ? true : false;
-	const isCreatedAt = req.query.createdAt === "true" ? true : false;
-	var usersProjection = !isID
-		? {
+	const reqQuery = { ...req.query };
+	console.log(Object.keys(reqQuery)[0]);
+	const isID = reqQuery.id === "true" ? true : false;
+	const isCreatedAt = reqQuery.createdAt === "true" ? true : false;
+	const isPopulate = reqQuery.populate === "true" ? true : false;
+	var usersProjection = {
+		_id: isID,
+		__v: false,
+		createdAt: isCreatedAt
+	};
+	if (Object.keys(reqQuery)[0] === 'populate') {
+		usersProjection = {
 			_id: false,
 			__v: false,
-		}
-		: { __v: false };
-	usersProjection["createdAt"] = isCreatedAt;
+			createdAt: false
+		};
+	}
 	let categoryModelQuery = CategorySchema.find(
-		{ ...queryParams, slug: categoryNameSlug },
+		{ slug: categoryNameSlug },
 		usersProjection
 	);
-	//#endregion
-
-	//#region Executing result and sending response
+	if (isPopulate && Object.keys(reqQuery)[0] === 'populate') {
+		categoryModelQuery = categoryModelQuery.populate({ path: "subcategories", select: "subcategoryName desc slug" });
+	}
 	const results = await categoryModelQuery;
+	//#region Executing result and sending response
 	if (Object.keys(results).length == 0) {
 		statusCode = 404;
 		return next(
@@ -72,6 +70,7 @@ exports.getSingleCategoryController = asyncHandler(async (req, res, next) => {
 		statusCode,
 		data: results,
 	});
+
 	//#endregion
 });
 //#endregion
@@ -253,46 +252,6 @@ exports.getSinglesubcategoryController = asyncHandler(async (req, res, next) => 
 });
 //#endregion
 
-//#region Update subcategory
-/** Update subcategory
- * @param desc      Update subcategory
- * @param route     PUT -> /api/v1/category/:categoryNameSlug/subcategory/:subcategoryNameSlug/
- * @param access    PRIVATE
- */
-exports.updateSubcategoryController = asyncHandler(async (req, res, next) => {
-	let statusCode = 200;
-	const categoryNameSlug = req.params.categoryNameSlug;
-	const subcategoryNameSlug = req.params.subcategoryNameSlug;
-	console.log(req.params);
-	// //#region Updating subcategory
-	// const updateSubcategoryModel = await SubcategorySchema.findOneAndUpdate(
-	// 	{ slug: subcategoryNameSlug },
-	// 	{ subcategoryName: req.body.subcategoryName, desc: req.body.desc },
-	// 	{ new: true, runValidators: true }
-	// );
-	// //#endregion
-
-	// //#region Sending response
-	// if (!updateSubcategoryModel) {
-	// 	statusCode = 404;
-	// 	return next(
-	// 		new ErrorResponse(
-	// 			statusCode,
-	// 			`Can't update details (name : \'${subcategoryNameSlug}\')`
-	// 		)
-	// 	);
-	// }
-
-	res.status(statusCode).json({
-		success: true,
-		statusCode: statusCode,
-		msg: "Subcategory details updated successfully",
-		data: updateSubcategoryModel,
-	});
-	//#endregion
-});
-//#endregion
-
 //#region Add new subcategory to category
 /** Add new subcategory to category
  * @param desc      Add new subcategory to category
@@ -335,6 +294,70 @@ exports.addNewSubCategoryController = asyncHandler(async (req, res, next) => {
 		success: true,
 		statusCode: statusCode,
 		msg,
+	});
+	//#endregion
+});
+//#endregion
+
+//#region Update subcategory
+/** Update subcategory
+ * @param desc      Update subcategory
+ * @param route     PUT -> /api/v1/category/:categoryNameSlug/subcategory/:subcategoryNameSlug/
+ * @param access    PRIVATE
+ */
+exports.updateSubcategoryController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	const categoryNameSlug = req.params.categoryNameSlug;
+	const subcategoryNameSlug = req.params.subcategoryNameSlug;
+
+	//#region Finding category and sending negative response if not found
+	const categoryModelQuery = await CategorySchema.find({ slug: categoryNameSlug });
+	if (Object.keys(categoryModelQuery).length == 0) {
+		statusCode = 404;
+		return next(
+			new ErrorResponse(
+				statusCode,
+				`Can't find resourse (name: ${categoryNameSlug})`
+			)
+		);
+	}
+	//#endregion
+
+	//#region finding subcategory & sends reaponse if not found
+	const findSubcategoryModel = await SubcategorySchema.findOne({ slug: subcategoryNameSlug }).count();
+	console.log(findSubcategoryModel);
+	if (!findSubcategoryModel) {
+		statusCode = 404;
+		return next(
+			new ErrorResponse(
+				statusCode,
+				`Can't find resourse (name : \'${subcategoryNameSlug}\')`
+			)
+		);
+	}
+	//#endregion
+
+	//#region updating subcategory & Sending response
+	const updateSubcategoryModel = await SubcategorySchema.updateOne(
+		{ slug: subcategoryNameSlug },
+		{ subcategoryName: req.body.subcategoryName, desc: req.body.desc },
+		{ new: true, runValidators: true }
+	);
+	console.log(updateSubcategoryModel);
+	if (!updateSubcategoryModel && updateSubcategoryModel.matchedCount !== 1) {
+		statusCode = 404;
+		return next(
+			new ErrorResponse(
+				statusCode,
+				`Can't update resourse (name : \'${subcategoryNameSlug}\')`
+			)
+		);
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		msg: `Subcategory details updated successfully (name : \'${subcategoryNameSlug}\')`,
 	});
 	//#endregion
 });

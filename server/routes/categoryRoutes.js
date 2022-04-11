@@ -31,10 +31,7 @@ categoryRouter
 
 categoryRouter
 	.route("/:categoryNameSlug")
-	.get(
-		advancedResult(CategorySchema, "subcategories", "_id categoryName desc slug"),
-		getSingleCategoryController
-	)
+	.get(getSingleCategoryController)
 	.put(protect, authorize('admin'), updateCategoryController)
 	.delete(protect, authorize('admin'), deleteCategoryController);
 
