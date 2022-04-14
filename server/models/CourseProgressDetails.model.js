@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const CourseProgressDetails = new mongoose.Schema({
-  CourseEnrollementId: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'CourseEnrollement',
+  courseEnrollementId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'CourseEnrollementDetails',
     required: true,
   },
-  CourseLectureId: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'CourseLecture',
+  courseLectureId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'CourseLectureDetails',
     required: true,
   },
 });

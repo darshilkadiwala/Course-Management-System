@@ -4,12 +4,12 @@ const { default: mongoose } = require("mongoose");
 const UserDetailSchema = new mongoose.Schema(
 	{
 		firstName: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add your first name"],
 			trim: true,
 		},
 		lastName: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add your last name"],
 			trim: true,
 		},
@@ -27,7 +27,7 @@ const UserDetailSchema = new mongoose.Schema(
 			},
 		},
 		emailId: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add an email id"],
 			match: [
 				/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/,
@@ -37,7 +37,7 @@ const UserDetailSchema = new mongoose.Schema(
 			unique: true,
 		},
 		username: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add username"],
 			match: [
 				/^[a-zA-Z0-9]*$/,
@@ -47,7 +47,7 @@ const UserDetailSchema = new mongoose.Schema(
 			unique: true,
 		},
 		password: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add a password"],
 			minlength: [8, "Password must be atleast 8 character long"],
 			match: [
@@ -57,7 +57,7 @@ const UserDetailSchema = new mongoose.Schema(
 			select: false,
 		},
 		gender: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			enum: {
 				values: ["male", "female", "other"],
 				message: "Invalid gender selection",
@@ -65,16 +65,16 @@ const UserDetailSchema = new mongoose.Schema(
 			required: [true, "Please select gender"],
 		},
 		profilePicture: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			default: "userProfile",
 		},
 		accountStatus: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			enum: ["active", "deactive"],
 			default: "active",
 		},
 		role: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			enum: ["student", "instructor", "admin"],
 			default: "student",
 		},

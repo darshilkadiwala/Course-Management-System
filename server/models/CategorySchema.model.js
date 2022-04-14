@@ -3,18 +3,18 @@ const { default: slugify } = require("slugify");
 const CategoryDetailSchema = new mongoose.Schema(
 	{
 		categoryName: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			unique: true,
 			required: [true, "Please add category name"],
 			trim: true,
 		},
 		desc: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add description about the category"],
 			trim: true,
 		},
 		slug: {
-			type: String,
+			type: mongoose.SchemaTypes.String,
 			unique: true,
 			trim: true,
 		},

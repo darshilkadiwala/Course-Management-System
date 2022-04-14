@@ -4,16 +4,16 @@ const ErrorResponse = require("../utils/errorResponse");
 const CategorySchema = require("./CategorySchema.model");
 const SubcategoryDetailSchema = new mongoose.Schema({
 	subcategoryName: {
-		type: String,
+		type: mongoose.SchemaTypes.String,
 		unique: true,
 		required: [true, "Please add subcategory name"],
 	},
 	desc: {
-		type: String,
+		type: mongoose.SchemaTypes.String,
 		required: [true, "Please add description about sub category"],
 	},
 	slug: {
-		type: String,
+		type: mongoose.SchemaTypes.String,
 		unique: true,
 		trim: true,
 	},

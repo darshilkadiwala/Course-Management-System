@@ -1,25 +1,25 @@
 const mongoose = require('mongoose');
 
 const CourseLectureDetailsSchema = new mongoose.Schema({
-  CourseSelectionId: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'CourseSelection',
+  courseSectionId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'CourseSectionDetails',
     required: true,
   },
-  LectureName: {
-    type: String,
+  lectureName: {
+    type: mongoose.SchemaTypes.String,
     required: [true, 'Please add leacture name'],
   },
-  LectureVideo: {
-    type: String,
+  lectureVideo: {
+    type: mongoose.SchemaTypes.String,
     required: [true, 'Please add lecture video'],
   },
-  LectureNotes: {
-    type: String,
+  lectureNotes: {
+    type: mongoose.SchemaTypes.String,
     required: [true, 'Please add lecture notes'],
   },
-  LectureMaterial: {
-    type: String,
+  lectureMaterial: {
+    type: mongoose.SchemaTypes.String,
     required: [true, 'Please add lecture material'],
   },
 });

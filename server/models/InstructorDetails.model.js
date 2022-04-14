@@ -1,25 +1,21 @@
 const mongoose = require('mongoose');
 
 const InstrctorDetailsSchema = new mongoose.Schema({
-  Headline: {
-    type: String,
+  headline: {
+    type: mongoose.SchemaTypes.String,
     required: [true, 'Please add headline'],
   },
-  Biography: {
-    type: String,
+  biography: {
+    type: mongoose.SchemaTypes.String,
     required: [true, 'Please add biography'],
   },
-  LinkedinProfileUrl: {
-    type: String,
+  linkedinProfileUrl: {
+    type: mongoose.SchemaTypes.String,
     required: [true, 'Please add LinkedinProfileUrl'],
   },
-  createAt: {
-    type: Date,
-    default: Date.now,
-  },
-  UID: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
+  userId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'UserDetail',
     required: true,
   },
 });
