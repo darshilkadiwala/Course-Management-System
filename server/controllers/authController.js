@@ -22,12 +22,12 @@ exports.loginController = asyncHandler(async (req, res, next) => {
 	);
 	if (!userModel) {
 		statusCode = 401;
-		return next(new ErrorResponse(statusCode, `Invalid credentials`));
+		return next(new ErrorResponse(statusCode, `Invalid username or password!!!`));
 	}
 	const isPassMatched = await userModel.matchPassword(password);
 	if (!isPassMatched) {
 		statusCode = 401;
-		return next(new ErrorResponse(statusCode, `Invalid credentials`));
+		return next(new ErrorResponse(statusCode, `Invalid username or password!!!`));
 	}
 	sendTokenResponse(userModel, statusCode, res);
 	// const token = userModel.getSignedJWTToken();
@@ -36,6 +36,25 @@ exports.loginController = asyncHandler(async (req, res, next) => {
 	// 	statusCode: statusCode,
 	// 	token,
 	// });
+});
+//#endregion
+
+//#region Logout user
+/** Logout user
+* @param desc      Logout user
+* @param route     GET -> /api/v1/auth/logout
+* @param access    PUBLIC
+*/
+exports.logoutController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	console.log(req.cookie.token);
+	// res.clearCookie('token'); 
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		message: "Logout successfully"
+	});
 });
 //#endregion
 
@@ -121,6 +140,6 @@ const sendTokenResponse = (userModel, statusCode, res, msg) => {
 		statusCode: statusCode,
 		msg,
 		token,
-	});
+	}).send();
 };
 //#endregion
