@@ -31,7 +31,6 @@ function Navbar(props) {
 	const logoutUser = () => {
 		localStorage.clear();
 		setAuth(false);
-		alert('Log from logoutUser :', String(authentication));
 		navigateTo('/login');
 	};
 	// toggleOpenDrawer();

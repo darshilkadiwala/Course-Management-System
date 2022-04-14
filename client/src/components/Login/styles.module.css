@@ -1,7 +1,7 @@
 .login_container {
 	width: 100%;
-	min-height: 100vh;
-	background-color: var (--white-color);
+	min-height: calc(100vh - 100px);
+	background-color: var(--white-color);
 	display: flex;
 	align-items: center;
 	justify-content: center;
