@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const { default: slugify } = require("slugify");
 const ErrorResponse = require("../utils/errorResponse");
 const CategorySchema = require("./CategorySchema.model");
+
 const SubcategoryDetailSchema = new mongoose.Schema({
 	subcategoryName: {
 		type: mongoose.SchemaTypes.String,

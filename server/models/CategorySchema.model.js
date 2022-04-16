@@ -38,7 +38,12 @@ CategoryDetailSchema.pre("save", async function (next) {
 	this.slug = slugify(this.categoryName, { lower: true, replacement: "-" });
 	next();
 });
-
+CategoryDetailSchema.pre("remove", async function (next) {
+	await this.model("Subcategory").deleteMany({
+		category: this._id,
+	});
+	next();
+});
 // TODO: method that will update slug value automatic after updating category details
 // CategoryDetailSchema.post("findOneAndUpdate", async function (next) {
 // 	console.log("Post Updating");

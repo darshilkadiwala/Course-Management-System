@@ -4,7 +4,6 @@ const CategorySchema = require("../models/CategorySchema.model");
 const SubcategorySchema = require("../models/SubcategorySchema.model");
 
 //#region category controllers
-
 //#region Get all category
 /** Get all category
  * @param desc      Get all category
@@ -152,7 +151,7 @@ exports.updateCategoryController = asyncHandler(async (req, res, next) => {
 exports.deleteCategoryController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
 	const categoryNameSlug = req.params.categoryNameSlug;
-	const deleteCategoryModel = await CategorySchema.findOneAndDelete({
+	const deleteCategoryModel = await CategorySchema.findOne({
 		slug: categoryNameSlug,
 	});
 
@@ -167,6 +166,8 @@ exports.deleteCategoryController = asyncHandler(async (req, res, next) => {
 		);
 	}
 
+	deleteCategoryModel.remove();
+
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
@@ -175,7 +176,6 @@ exports.deleteCategoryController = asyncHandler(async (req, res, next) => {
 	//#endregion
 });
 //#endregion
-
 //#endregion
 
 //#region Subcategory contollers

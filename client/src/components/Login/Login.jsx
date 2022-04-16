@@ -23,6 +23,7 @@ export function Login(props) {
 			setError('');
 			console.table(res.token);
 			localStorage.setItem('loginToken', res.token);
+			console.log(res);
 			setAuth(true);
 			console.log('Log from login page :', authentication);
 			navigateTo('/');

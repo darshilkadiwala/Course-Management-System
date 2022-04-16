@@ -1,4 +1,5 @@
-node module used in this project
+# node module used in this project
+
 bcryptjs
 body-parser
 colors
@@ -12,3 +13,4 @@ mongoose
 morgan
 validator
 nodemon (dev dependency)
+modemailer

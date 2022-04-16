@@ -1,6 +1,9 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { default: mongoose } = require("mongoose");
+
+
 const UserDetailSchema = new mongoose.Schema(
 	{
 		firstName: {
@@ -66,7 +69,7 @@ const UserDetailSchema = new mongoose.Schema(
 		},
 		profilePicture: {
 			type: mongoose.SchemaTypes.String,
-			default: "userProfile",
+			default: "userProfile.png",
 		},
 		accountStatus: {
 			type: mongoose.SchemaTypes.String,
@@ -77,6 +80,10 @@ const UserDetailSchema = new mongoose.Schema(
 			type: mongoose.SchemaTypes.String,
 			enum: ["student", "instructor", "admin"],
 			default: "student",
+		},
+		emailVerified: {
+			type: mongoose.SchemaTypes.Boolean,
+			default: false,
 		},
 		resetPasswordToken: String,
 		resetPasswordExpire: Date,
@@ -92,16 +99,28 @@ const UserDetailSchema = new mongoose.Schema(
 );
 // Encrypt Password using bcrypt
 UserDetailSchema.pre("save", async function (next) {
+	console.log("Save updating");
+	if (!this.isModified('password')) { next(); }
 	const salt = await bcrypt.genSalt();
 	this.password = await bcrypt.hash(this.password, salt);
 });
 
+UserDetailSchema.pre("update", async function (next) {
+	console.log("UPDATING");
+});
+
 // get Signed JWT Token
 UserDetailSchema.methods.getSignedJWTToken = function () {
-
 	return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRE,
 	});
+};
+// get Reset password Token
+UserDetailSchema.methods.getResetPasswordToken = function () {
+	const token = crypto.randomBytes(30).toString('hex');
+	this.resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+	this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+	return token;
 };
 
 // Match passwrod with encrypted password
