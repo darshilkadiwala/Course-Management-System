@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { default: mongoose } = require("mongoose");
 
 const CourseBasicDetailsSchema = new mongoose.Schema({
 	instructorId: {
@@ -14,27 +14,32 @@ const CourseBasicDetailsSchema = new mongoose.Schema({
 	courseTitle: {
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add couse title'],
+		unique: true,
+		trim: true,
 	},
 	courseSubTitle: {
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add couse sub-title'],
+		trim: true,
 	},
 	description: {
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add description'],
+		trim: true,
 	},
-	language: {
-		type: mongoose.SchemaTypes.String,
-		required: [true, 'Please add language'],
-	},
+	// language: {
+	// 	type: mongoose.SchemaTypes.String,
+	// 	required: [true, 'Please add language'],
+	// },
 	courseLevel: {
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add course level'],
+		enum: ["beginner", "intermediate", "advanced"],
 	},
-	courseOutcomes: {
+	courseOutcomes: [{
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add course outcomes'],
-	},
+	}],
 	courseImages: {
 		type: mongoose.SchemaTypes.String,
 		// required: [true, 'Please add course Image'],

@@ -32,20 +32,14 @@ const UserDetailSchema = new mongoose.Schema(
 		emailId: {
 			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add an email id"],
-			match: [
-				/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/,
-				"Please use a valid email id",
-			],
+			match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/, "Please use a valid email id"],
 			trim: true,
 			unique: true,
 		},
 		username: {
 			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add username"],
-			match: [
-				/^[a-zA-Z0-9]*$/,
-				"Use only alphanumeric characters for Username",
-			],
+			match: [/^[a-zA-Z0-9]*$/, "Use only alphanumeric characters for Username"],
 			trim: true,
 			unique: true,
 		},
@@ -99,7 +93,6 @@ const UserDetailSchema = new mongoose.Schema(
 );
 // Encrypt Password using bcrypt
 UserDetailSchema.pre("save", async function (next) {
-	console.log("Save updating");
 	if (!this.isModified('password')) { next(); }
 	const salt = await bcrypt.genSalt();
 	this.password = await bcrypt.hash(this.password, salt);

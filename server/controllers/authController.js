@@ -184,14 +184,15 @@ exports.forgotPasswordController = asyncHandler(async (req, res, next) => {
 			subject: 'Password reset token',
 			message
 		});
-		if (isMailSent) {
-			await userModel.save({ validateBeforeSave: false })
-			res.status(statusCode).json({
-				success: true,
-				statusCode: statusCode,
-				message: 'Email has been sent to your email address'
-			});
-		}
+		// console.log(isMailSent);
+		// if (isMailSent) {
+		await userModel.save({ validateBeforeSave: false })
+		res.status(statusCode).json({
+			success: true,
+			statusCode: statusCode,
+			message: 'Email has been sent to your email address'
+		});
+		// }
 	} catch (error) {
 		userModel.resetPasswordToken = undefined;
 		userModel.resetPasswordExpire = undefined;
@@ -338,9 +339,7 @@ exports.changePasswordController = asyncHandler(async (req, res, next) => {
 	if (!oldPassword || !newPassword) {
 		return next(new ErrorResponse(400, "Please provide a passwords"));
 	}
-	if (oldPassword === newPassword) {
-		return next(new ErrorResponse(400, "Please enter password which not used in previously"));
-	}
+
 
 	const userModel = await UserDetailSchema.findById(req.user.id).select("+password");
 	console.log(userModel.password);
@@ -348,12 +347,17 @@ exports.changePasswordController = asyncHandler(async (req, res, next) => {
 		statusCode = 400;
 		return next(new ErrorResponse(statusCode, `Can't find user`));
 	}
-	const isPassMatched = await userModel.matchPassword(newPassword);
+
+	const isPassMatched = await userModel.matchPassword(oldPassword);
 	if (!isPassMatched) {
 		statusCode = 400;
-		return next(new ErrorResponse(statusCode, `Old password not matched!!!`));
+		return next(new ErrorResponse(statusCode, `Invalid password!!!`));
+	} else {
+		console.log(oldPassword);
 	}
-
+	if (oldPassword === newPassword) {
+		return next(new ErrorResponse(400, "Please enter password which not used in previously"));
+	}
 	userModel.password = newPassword;
 	await userModel.save();
 	res.status(statusCode).json({
