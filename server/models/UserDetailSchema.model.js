@@ -127,4 +127,7 @@ UserDetailSchema.methods.getResetPasswordToken = function () {
 UserDetailSchema.methods.matchPassword = async function (enteredPassword) {
 	return await bcrypt.compare(enteredPassword, this.password);
 };
+UserDetailSchema.methods.matchPassword = async function (enteredPassword) {
+	return await bcrypt.compare(enteredPassword, this.password);
+};
 module.exports = mongoose.model("UserDetail", UserDetailSchema);

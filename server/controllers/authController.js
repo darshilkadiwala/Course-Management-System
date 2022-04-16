@@ -179,17 +179,19 @@ exports.forgotPasswordController = asyncHandler(async (req, res, next) => {
 	const message = `Your reset password link is here \n\n\n ${resetUrl}`
 
 	try {
-		await sendEmail({
+		const isMailSent = await sendEmail({
 			email: userModel.emailId,
 			subject: 'Password reset token',
 			message
 		});
-		await userModel.save({ validateBeforeSave: false })
-		res.status(statusCode).json({
-			success: true,
-			statusCode: statusCode,
-			message: 'Email has been sent to your email address'
-		});
+		if (isMailSent) {
+			await userModel.save({ validateBeforeSave: false })
+			res.status(statusCode).json({
+				success: true,
+				statusCode: statusCode,
+				message: 'Email has been sent to your email address'
+			});
+		}
 	} catch (error) {
 		userModel.resetPasswordToken = undefined;
 		userModel.resetPasswordExpire = undefined;
@@ -334,14 +336,14 @@ exports.changePasswordController = asyncHandler(async (req, res, next) => {
 	const { oldPassword, newPassword } = req.body;
 
 	if (!oldPassword || !newPassword) {
-		return next(
-			new ErrorResponse(400, "Please provide a passwords")
-		);
+		return next(new ErrorResponse(400, "Please provide a passwords"));
+	}
+	if (oldPassword === newPassword) {
+		return next(new ErrorResponse(400, "Please enter password which not used in previously"));
 	}
 
-	const userModel = await UserDetailSchema.findById(req.user.id).select(
-		"+password"
-	);
+	const userModel = await UserDetailSchema.findById(req.user.id).select("+password");
+	console.log(userModel.password);
 	if (!userModel) {
 		statusCode = 400;
 		return next(new ErrorResponse(statusCode, `Can't find user`));
@@ -352,10 +354,12 @@ exports.changePasswordController = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(statusCode, `Old password not matched!!!`));
 	}
 
+	userModel.password = newPassword;
+	await userModel.save();
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		result: req.body
+		msg: 'Password updated successfully',
 	});
 });
 //#endregion

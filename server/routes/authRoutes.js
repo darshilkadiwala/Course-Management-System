@@ -10,6 +10,7 @@ const {
 	resetPasswordWithTokenController,
 	updateProfileController,
 	updateProfilePhotoController,
+	changePasswordController,
 } = require("../controllers/authController");
 const { protect } = require("../middlewares/authenticationMiddleware");
 
@@ -20,6 +21,7 @@ authRouter.route("/forgotpassword").post(forgotPasswordController);
 authRouter.route("/logout").post(logoutController);
 authRouter.route("/resetpassword/:resetToken").put(resetPasswordWithTokenController);
 authRouter.route("/updateProfile").put(protect, updateProfileController);
+authRouter.route("/changePassword").put(protect, changePasswordController);
 authRouter.route("/updateProfilePhoto").put(protect, updateProfilePhotoController);
 authRouter.route("/me").get(protect, getMe);
 module.exports = authRouter;
