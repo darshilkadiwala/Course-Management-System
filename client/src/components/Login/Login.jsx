@@ -8,8 +8,8 @@ export function Login(props) {
 	const { authentication, setAuth } = useContext(AuthContext);
 	const navigateTo = useNavigate();
 	const [error, setError] = useState('');
-	const [username, setUsername] = useState('admin123');
-	const [password, setPassword] = useState('Admin@123');
+	const [username, setUsername] = useState('');
+	const [password, setPassword] = useState('');
 
 	if (authentication) {
 		navigateTo('/');

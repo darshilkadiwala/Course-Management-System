@@ -37,7 +37,7 @@ const ErrorHandler = (err, req, res, next) => {
 				}
 			});
 		} else if (err.name === "TypeError") {
-			console.log(err.name);
+			console.log(err);
 			Object.entries(err).forEach(function (key) {
 				console.log(key);
 			});

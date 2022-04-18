@@ -66,7 +66,7 @@ function Navbar(props) {
 							</>
 						) : (
 							<>
-								<button onClick={logoutUser} className='login btn btn-transparent'>
+								<button onClick={logoutUser} className='login btn btn-success'>
 									Logout
 								</button>
 								<a className='login' href='/'>

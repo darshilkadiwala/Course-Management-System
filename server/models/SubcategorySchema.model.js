@@ -9,10 +9,12 @@ const SubcategoryDetailSchema = new mongoose.Schema(
 			type: mongoose.SchemaTypes.String,
 			unique: true,
 			required: [true, "Please add subcategory name"],
+			trim: true,
 		},
 		desc: {
 			type: mongoose.SchemaTypes.String,
 			required: [true, "Please add description about sub category"],
+			trim: true,
 		},
 		slug: {
 			type: mongoose.SchemaTypes.String,
@@ -38,6 +40,7 @@ const SubcategoryDetailSchema = new mongoose.Schema(
 	}
 );
 
+
 SubcategoryDetailSchema.pre("save", async function (next) {
 	this.slug = slugify(this.subcategoryName, { lower: true, replacement: "-" });
 	const categoryModel = await CategorySchema.findOneAndUpdate(
@@ -51,4 +54,5 @@ SubcategoryDetailSchema.pre("save", async function (next) {
 	}
 	next();
 });
+
 module.exports = mongoose.model("Subcategory", SubcategoryDetailSchema);

@@ -12,6 +12,7 @@ const errorHandler = require("./middlewares/errorHandler");
 // TODO: require all routes file here
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
+const courseRouter = require("./routes/courseRoutes");
 
 const app = express();
 
@@ -37,6 +38,7 @@ dbConnection();
 //TODO: add routes here
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/courses", courseRouter);
 
 // Handling errors
 app.use(errorHandler);

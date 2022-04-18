@@ -45,7 +45,7 @@ export default function App() {
 								onClick={
 									setAlert
 								}
-							>Jumbo action name</button>
+							>Register</button>
 						</div>
 					</div>} />
 				<Route path="/about" element={<div className='container'>About</div>} />

@@ -1,4 +1,3 @@
-const SubcategorySchema = require("../models/SubcategorySchema.model");
 const advancedResult =
 	(model, populate = undefined, select = undefined) =>
 		async (req, res, next) => {
@@ -19,7 +18,7 @@ const advancedResult =
 			//#region fetching params from request
 			const isID = req.query.id === "true" ? true : false;
 			const isCreatedAt = req.query.createdAt === "true" ? true : false;
-			const isPagination = req.query.pagination === "true" ? true : false;
+			const isPagination = (req.query.pagination && req.query.pagination === "false") ? false : true;
 			const isPopulate = req.query.populate === "true" ? true : false;
 			//#endregion
 
@@ -37,6 +36,7 @@ const advancedResult =
 					__v: false,
 				}
 				: { __v: false };
+
 			usersProjection["createdAt"] = isCreatedAt;
 
 			let modelQuery = model.find(queryParams, usersProjection);
@@ -57,16 +57,13 @@ const advancedResult =
 				modelQuery = modelQuery.sort("createdAt");
 			}
 			const totalDocuments = await model.countDocuments();
-			// console.log("______________________________________");
-			// console.log(totalDocuments);
-			// console.log(queryParams);
 			if (!totalDocuments) {
 				next(new ErrorResponse(204, `Can't find any resourses`));
 			}
 			//#endregion
 
 			//#region pagination
-			const pagination = undefined;
+			let pagination = undefined;
 			if (isPagination) {
 				pagination = {};
 				const page = parseInt(req.query.page, 10) || 1;

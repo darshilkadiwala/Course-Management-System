@@ -1,214 +1,296 @@
-const Course = require("../models/CourseBasicDetails.model");
+const path = require('path');
+const fs = require('fs');
 const ErrorResponse = require("../utils/errorResponse");
-const asyncHandler = require("../middleware/async");
+const asyncHandler = require("../middlewares/asyncHandler");
+const CourseBasicDetailSchema = require("../models/CourseBasicDetailSchema.model");
+const SubcategoryDetailSchema = require("../models/SubcategorySchema.model");
+const CourseSectionDetailSchema = require("../models/CourseSectionDetailSchema.model");
 
+//#region Course Basic details
 //#region Get All courses
 /** Get All courses
  * @param desc		Get all courses
- * @param route		GET /api/v1/courses
- * @param route		GET /api/v1/bootcamps/:bootcampId/courses
+ * @param route	GET /api/v1/courses
  * @param access	PUBLIC
  **/
-exports.getCourses = asyncHandler(async (req, res, next) => {
-	let statusCode = 200;
-	const reqQuery = { ...req.query };
-	const removeFields = ["select", "sort", "page", "limit"];
-	removeFields.forEach((param) => delete reqQuery[param]);
-
-	let queryString = JSON.stringify(reqQuery);
-	queryString = queryString.replace(
-		/\b(gt|gte|lt|lte|in)\b/g,
-		(match) => `$${match}`
-	);
-
-	let queryParams = JSON.parse(queryString);
-
-	let coursesQuery = Course.find();
-
-	//#region selecting & sorting fields
-	// selecting fields
-	if (req.query.select) {
-		const fields = req.query.select.split(",").join(" ");
-		coursesQuery = coursesQuery.select(fields);
-	}
-	// sorting fields
-	if (req.query.sort) {
-		const sortBy = req.query.sort.split(",").join(" ");
-		coursesQuery = coursesQuery.sort(sortBy);
-	} else {
-		coursesQuery = coursesQuery.sort("createdAt");
-	}
-	//#endregion
-
-	//#region pagination
-	const page = parseInt(req.query.page, 10) || 1;
-	const limit = parseInt(req.query.limit, 10) || 5;
-	const startIndex = (page - 1) * limit;
-	const endIndex = page * limit;
-	const totalDocuments = await Course.countDocuments(queryParams);
-	const pagination = {};
-	if (endIndex < totalDocuments) {
-		pagination.next = { page: page + 1, limit };
-	}
-	if (startIndex > 0) {
-		pagination.prev = { page: page - 1, limit };
-	}
-	//#endregion
-
-	// fetching courses with limits
-	coursesQuery = coursesQuery.skip(startIndex).limit(limit);
-	const courses = await coursesQuery;
-
+exports.getCoursesController = asyncHandler(async (req, res, next) => {
 	//#region sending response
-	if (!courses) {
-		return next(new ErrorResponse(statusCode, `Can't find any resourses`));
-	}
-	res.status(statusCode).json({
-		success: true,
-		statusCode: statusCode,
-		msg: "Courses",
-		count: courses.length,
-		totalDocuments,
-		pagination: pagination,
-		data: courses,
-	});
-	//#endregion
-});
-//#endregion
-
-//#region 
-/**Get course by id
- * @param desc      Get single course
- * @param route     GET /api/v1/courses/:id
- * @param route		GET /api/v1/bootcamps/:bootcampId/courses/:id
- * @param access    PUBLIC
- */
-exports.getCourse = asyncHandler(async (req, res, next) => {
-	// let statusCode = 200;
-	// let courseQuery = Course.findById(req.params.id).populate({
-	// 	path: "bootcamp",
-	// });
-
-	// //#region selecting & sorting fields
-	// // selecting fields
-	// if (req.query.select) {
-	// 	const fields = req.query.select.split(",").join(" ");
-	// 	courseQuery = courseQuery.select(fields);
-	// }
-	// // sorting fields
-	// if (req.query.sort) {
-	// 	const sortBy = req.query.sort.split(",").join(" ");
-	// 	courseQuery = courseQuery.sort(sortBy);
-	// } else {
-	// 	courseQuery = courseQuery.sort("createdAt");
-	// }
-	// //#endregion
-
-	// const course = await courseQuery;
-	// //#region sending response
-	// if (!course) {
-	// 	statusCode = 404;
-	// 	return next(
-	// 		new ErrorResponse(
-	// 			statusCode,
-	// 			`Can't find course details (id: \'${req.params.id}\')`
-	// 		)
-	// 	);
-	// }
 	if (!res.advancedResult.totalDocuments) {
 		return next(new ErrorResponse(404, `Can't find any resourses`));
 	}
+	res.advancedResult.data.sort(function (course1, course2) {
+		return course1.courseTitle.localeCompare(course2.courseTitle);
+	});
 	res.status(res.advancedResult.statusCode).json({
 		success: true,
-		msg: `Course Details (id: ${req.params.id})`,
+		msg: `All Course basic details`,
 		...res.advancedResult,
 	});
-	//// #endregion
+	// #endregion
 });
 //#endregion
 
-//#region 
+//#region Get course by slug
 /**Get course by id
- * @param desc      Add course
- * @param route		POST /api/v1/bootcamps/:bootcampId/courses/
- * @param access    PRIVATE
+ * @param desc      Get single course
+ * @param route     GET /api/v1/courses/:courseSlug
+ * @param access    PUBLIC
  */
-exports.addCourse = asyncHandler(async (req, res, next) => {
-	let statusCode = 201;
-	req.body.bootcamp = req.params.bootcampId;
-
-	const bootcamp = Bootcamp.findById(req.params.bootcampId);
-	//#region send error response if boocamp did not found
-	if (!bootcamp) {
+exports.getSingleCourseController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	const courseSlug = req.params.courseSlug;
+	const reqQuery = { ...req.query };
+	const isID = reqQuery.id === "true" ? true : false;
+	const isCreatedAt = reqQuery.createdAt === "true" ? true : false;
+	const isPopulate = reqQuery.populate === "true" ? true : false;
+	var courseProjection = {
+		_id: isID,
+		__v: false,
+		createdAt: isCreatedAt
+	};
+	if (Object.keys(reqQuery)[0] === 'populate') {
+		courseProjection = {
+			_id: false,
+			__v: false,
+			createdAt: false
+		};
+	}
+	let courseBasicDetailsModel = CourseBasicDetailSchema.find(
+		{ slug: courseSlug },
+		courseProjection
+	);
+	if (isPopulate && Object.keys(reqQuery)[0] === 'populate') {
+		courseBasicDetailsModel = courseBasicDetailsModel.populate({ path: "courseSubcategory", populate: { path: "category", select: "categoryName desc slug", model: "Category" } });
+		courseBasicDetailsModel = courseBasicDetailsModel.populate({ path: "instructor", select: "firstName lastName profilePicture" });
+	}
+	const results = await courseBasicDetailsModel;
+	//#region Executing result and sending response
+	if (Object.keys(results).length == 0) {
 		statusCode = 404;
 		return next(
 			new ErrorResponse(
 				statusCode,
-				`Can't find bootcamp with id: \'${req.params.id}\'`
+				`Can't find resourse (name: ${courseSlug})`
 			)
 		);
 	}
+	res.status(statusCode).json({
+		success: true,
+		statusCode,
+		data: results,
+	});
+
 	//#endregion
+});
+//#endregion
 
-	const course = await Course.create(req.body);
+//#region Add course
+/**Add course
+ * @param desc			Add course
+ * @param route		POST /api/v1/courses/
+ * @param access		PRIVATE
+ */
+exports.addCourseController = asyncHandler(async (req, res, next) => {
+	let statusCode = 201;
+	const {
+		subcategorySlug,
+		courseTitle,
+		courseSubTitle,
+		description,
+		courseLevel,
+		courseOutcomes,
+		courseRequirment
+	} = req.body;
 
-	//#region sending response
-	if (!course) {
-		statusCode = 404;
+	if (!subcategorySlug) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Please select subcategory`));
+	}
+	const subcategoriesModel = await SubcategoryDetailSchema.findOne({ slug: subcategorySlug }).select("subcategoryName");
+
+	if (Object.keys(subcategoriesModel).length == 0) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't find subcategory`));
+	}
+	const course = {
+		courseSubcategory: subcategoriesModel.id,
+		instructor: req.user.id,
+		courseTitle,
+		courseSubTitle,
+		description,
+		courseLevel,
+		courseOutcomes,
+		courseRequirment
+	};
+
+	const courseModel = await CourseBasicDetailSchema.create(course);
+
+	// #region sending response
+	if (!courseModel) {
+		statusCode = 500;
 		return next(new ErrorResponse(statusCode, `Can't add new course`));
 	}
+
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		msg: `New Course added`,
-		data: course,
+		msg: `New Course added`
 	});
 	//#endregion
 });
 //#endregion
 
-//#region 
-/** Update course by id
+//#region Update course
+/** Update course
  * @param desc        Update course
- * @param route       PUT /api/v1/courses/:id
+ * @param route       PUT /api/v1/courses/:courseSlug
  * @param access      PRIVATE
  */
-exports.updateCourse = asyncHandler(async (req, res, next) => {
+exports.updateCourseController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
-	const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
+	const {
+		courseTitle,
+		courseSubTitle,
+		description,
+		courseLevel,
+		courseOutcomes,
+		courseRequirment,
+	} = req.body;
+	const course = {
+		courseTitle,
+		courseSubTitle,
+		description,
+		courseLevel,
+		courseOutcomes,
+		courseRequirment,
+		lastUpdatedAt: Date.now(),
+	};
+
+	const updatedCourseModel = await CourseBasicDetailSchema.updateOne({
+		slug: req.params.courseSlug, instructor: req.user.id
+	}, course, { upsert: true, runValidators: true });
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		msg: `Course updated (course: ${req.params.courseSlug})`,
+	});
+});
+//#endregion
+
+//#region Update course status
+/** Update course status
+ * @param desc        Update course status
+ * @param route       PUT /api/v1/courses/:courseSlug/status
+ * @param access      PRIVATE
+ */
+exports.updateCourseStatusController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	if (!req.body.courseStatus) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, "Invalid course status"));
+	}
+	const courseStatusModel = await CourseBasicDetailSchema.findOneAndUpdate(
+		{ slug: req.params.courseSlug, instructor: req.user.id },
+		{ courseStatus: req.body.courseStatus, lastUpdatedAt: Date.now() }, {
+		upsert: true,
+		runValidators: true
 	});
 
 	//#region sending response
-	if (!course) {
+	if (!courseStatusModel) {
 		statusCode = 404;
 		return next(
 			new ErrorResponse(
 				statusCode,
-				`Can't find resourse Details (id: \'${req.params.id}\')`
+				`Can't find resourse Details (\'${req.params.courseSlug}\')`
 			)
 		);
 	}
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		msg: `Course updated (id: ${req.params.id})`,
-		data: course,
+		msg: `Course updated (course: ${req.params.courseSlug})`,
 	});
 	//#endregion
 });
 //#endregion
 
-//#region 
-/** Delete course by id
+//#region Update course image
+/** Update course image
+* @param desc      Update course image
+* @param route     PUT -> /api/v1/courses/:courseSlug/updateCourseImage
+* @param access    PRIVATE
+*/
+exports.updateCourseImageController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	const oldfile = req.courseModel.courseImages[0];
+	//#region sending response if file not found
+	if (!req.files || Object.keys(req.files).length === 0 || !req.files.courseImage) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, "Please upload a image file"));
+	}
+	//#endregion
+	const courseImage = req.files.courseImage;
+
+	//#region checking file mimetype and size
+	if (!courseImage.mimetype.startsWith('image')) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, "Please upload only an image file"));
+	}
+
+	if (courseImage.size > process.env.FILE_UPLOAD_MAX_SIZE_1MB * 5) {
+		statusCode = 400;
+		return next(new ErrorResponse(
+			statusCode,
+			`Please upload an image file with size of less than ${(process.env.FILE_UPLOAD_MAX_SIZE_1MB / 1024 / 1024) * 5} MB`));
+	}
+	//#endregion
+
+	//#region creating filename and storing it
+	courseImage.name = `course_${req.params.courseSlug}_${Date.now()}${path.parse(courseImage.name).ext}`;
+
+	courseImage.mv(`${process.env.FILE_UPLOAD_PATH_COURSE_IMAGE}/${courseImage.name}`, async (err) => {
+		if (err) {
+			statusCode = 500;
+			return next(new ErrorResponse(statusCode, `Problem with file upload`));
+		}
+		const lastUpdatedAt = Date.now();
+		const updateCourseImageModel = await CourseBasicDetailSchema.updateOne({
+			slug: req.params.courseSlug, instructor: req.user.id
+		}, { courseImages: [courseImage.name], lastUpdatedAt }, { upsert: true, runValidators: true });
+
+		if (!updateCourseImageModel) {
+			statusCode = 400;
+			return next(new ErrorResponse(statusCode, `Can't update details...`));
+		}
+		if (oldfile) {
+			fs.unlink(`${process.env.FILE_UPLOAD_PATH_COURSE_IMAGE}/${oldfile}`, async (err) => {
+				if (err) {
+					console.log(err);
+				}
+			});
+		}
+
+		res.status(statusCode).json({
+			success: true,
+			statusCode: statusCode,
+			msg: "Profile photo updated",
+		});
+	})
+	//#endregion
+});
+//#endregion
+
+//#region Delete course
+/** Delete course
  * @param desc        Delete course
- * @param route       DELETE /api/v1/courses/:id
+ * @param route       DELETE /api/v1/courses/:courseSlug
  * @param access      PRIVATE
  */
-exports.deleteCourse = asyncHandler(async (req, res, next) => {
+exports.deleteCourseController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
-	const course = await Course.findById(req.params.id);
+	const course = await CourseBasicDetailSchema.findById(req.params.courseSlug);
 
 	//#region sending response if course not found
 	if (!course) {
@@ -216,7 +298,7 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
 		return next(
 			new ErrorResponse(
 				statusCode,
-				`Can't find resourse Details (id: \'${req.params.id}\')`
+				`Can't find resourse Details (\'${req.params.courseSlug}\')`
 			)
 		);
 	}
@@ -229,9 +311,33 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		msg: `Course deleted (id: ${req.params.id})`,
-		data: course,
+		msg: `Course deleted (${req.params.courseSlug})`,
 	});
 	//#endregion
+});
+//#endregion
+
+//#endregion
+
+//#region Add new section to course
+/** Add new section to course
+* @param desc      Add new section to course
+* @param route     POST -> /courses/section/
+* @param access    PRIVATE
+*/
+exports.addNewSectionController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	console.log(req.body);
+	const courseSectionModel = await CourseSectionDetailSchema.create({});
+	if (!courseSectionModel) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't create new course section`));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		result: req.body
+	});
 });
 //#endregion

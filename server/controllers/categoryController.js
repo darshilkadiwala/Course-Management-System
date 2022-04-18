@@ -30,7 +30,6 @@ exports.getSingleCategoryController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
 	const categoryNameSlug = req.params.categoryNameSlug;
 	const reqQuery = { ...req.query };
-	console.log(Object.keys(reqQuery)[0]);
 	const isID = reqQuery.id === "true" ? true : false;
 	const isCreatedAt = reqQuery.createdAt === "true" ? true : false;
 	const isPopulate = reqQuery.populate === "true" ? true : false;
@@ -87,7 +86,6 @@ exports.addNewCategoryController = asyncHandler(async (req, res, next) => {
 		categoryName,
 		desc,
 	});
-	console.log("From categoryController : " + categoryModel);
 	if (!categoryModel) {
 		statusCode = 404;
 		return next(new ErrorResponse(statusCode, `Can't add new category`));
@@ -188,6 +186,9 @@ exports.deleteCategoryController = asyncHandler(async (req, res, next) => {
  */
 exports.getAllSubcategoryByCategoryController = asyncHandler(
 	async (req, res, next) => {
+		res.advancedResult.data.sort(function (subcategory1, subcategory2) {
+			return subcategory1.subcategoryName.localeCompare(subcategory2.subcategoryName);
+		});
 		res.status(res.advancedResult.statusCode).json({
 			success: true,
 			msg: `All subcategory for category : ${req.params.categoryNameSlug}`,
@@ -326,7 +327,6 @@ exports.updateSubcategoryController = asyncHandler(async (req, res, next) => {
 
 	//#region finding subcategory & sends reaponse if not found
 	const findSubcategoryModel = await SubcategorySchema.findOne({ slug: subcategoryNameSlug }).count();
-	console.log(findSubcategoryModel);
 	if (!findSubcategoryModel) {
 		statusCode = 404;
 		return next(
@@ -339,13 +339,12 @@ exports.updateSubcategoryController = asyncHandler(async (req, res, next) => {
 	//#endregion
 
 	//#region updating subcategory & Sending response
-	const updateSubcategoryModel = await SubcategorySchema.updateOne(
+	const updatedSubcategoryModel = await SubcategorySchema.updateOne(
 		{ slug: subcategoryNameSlug },
 		{ subcategoryName: req.body.subcategoryName, desc: req.body.desc },
 		{ new: true, runValidators: true }
 	);
-	console.log(updateSubcategoryModel);
-	if (!updateSubcategoryModel && updateSubcategoryModel.matchedCount !== 1) {
+	if (!updatedSubcategoryModel && updatedSubcategoryModel.matchedCount !== 1) {
 		statusCode = 404;
 		return next(
 			new ErrorResponse(

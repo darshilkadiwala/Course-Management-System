@@ -1,12 +1,13 @@
 const { default: mongoose } = require("mongoose");
+const { default: slugify } = require("slugify");
 
 const CourseBasicDetailsSchema = new mongoose.Schema({
-	instructorId: {
+	instructor: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'UserDetail',
 		required: true,
 	},
-	courseSubcategoryId: {
+	courseSubcategory: {
 		type: mongoose.SchemaTypes.ObjectId,
 		ref: 'Subcategory',
 		required: true,
@@ -27,35 +28,33 @@ const CourseBasicDetailsSchema = new mongoose.Schema({
 		required: [true, 'Please add description'],
 		trim: true,
 	},
-	// language: {
-	// 	type: mongoose.SchemaTypes.String,
-	// 	required: [true, 'Please add language'],
-	// },
+
 	courseLevel: {
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add course level'],
-		enum: ["beginner", "intermediate", "advanced"],
+		enum: { values: ["beginner", "intermediate", "advanced"], message: "Invalid course level selected" }
 	},
 	courseOutcomes: [{
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add course outcomes'],
 	}],
-	courseImages: {
+	courseImages: [{
 		type: mongoose.SchemaTypes.String,
-		// required: [true, 'Please add course Image'],
-	},
-	courseRequirment: {
+	}],
+	courseRequirment: [{
 		type: mongoose.SchemaTypes.String,
 		required: [true, 'Please add course requirment'],
-	},
-	courseFor: {
+	}],
+	slug: {
 		type: mongoose.SchemaTypes.String,
-		required: [true, 'Please add course for'],
+		unique: true,
+		trim: true,
 	},
+
 	courseStatus: {
 		type: mongoose.SchemaTypes.String,
-		enum: ["active", "deactive", "draft", "underReview"],
-		default: "active",
+		enum: { values: ["published", "archived", "draft"], message: "Invalid course status" },
+		default: "draft",
 	},
 	lastUpdatedAt: {
 		type: Date,
@@ -65,6 +64,23 @@ const CourseBasicDetailsSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+
+	// courseFor: {
+	// 	type: mongoose.SchemaTypes.String,
+	// 	required: [true, 'Please add course for'],
+	// },
+	// courseLanguage: {
+	// 	type: mongoose.SchemaTypes.String,
+	// 	required: [true, 'Please choose course language'],
+	// 	enum: {values:["active", "deactive", "draft", "underReview"],message:"Invalid course language selected"},
+	// },
+}, {
+	toJSON: { virtuals: true },
+	toObject: { virtuals: true }
+});
+CourseBasicDetailsSchema.pre("save", async function (next) {
+	this.slug = slugify(this.courseTitle, { lower: true, replacement: "-" });
+	next();
 });
 
 module.exports = mongoose.model('CourseBasicDetails', CourseBasicDetailsSchema);

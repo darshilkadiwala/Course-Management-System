@@ -72,7 +72,7 @@ const UserDetailSchema = new mongoose.Schema(
 		},
 		role: {
 			type: mongoose.SchemaTypes.String,
-			enum: ["student", "instructor", "admin"],
+			enum: { values: ["student", "instructor", "admin"], message: "Invalid role name" },
 			default: "student",
 		},
 		emailVerified: {
@@ -98,9 +98,9 @@ UserDetailSchema.pre("save", async function (next) {
 	this.password = await bcrypt.hash(this.password, salt);
 });
 
-UserDetailSchema.pre("update", async function (next) {
-	console.log("UPDATING");
-});
+// UserDetailSchema.pre("update", async function (next) {
+// 	console.log("UPDATING");
+// });
 
 // get Signed JWT Token
 UserDetailSchema.methods.getSignedJWTToken = function () {
@@ -117,9 +117,6 @@ UserDetailSchema.methods.getResetPasswordToken = function () {
 };
 
 // Match passwrod with encrypted password
-UserDetailSchema.methods.matchPassword = async function (enteredPassword) {
-	return await bcrypt.compare(enteredPassword, this.password);
-};
 UserDetailSchema.methods.matchPassword = async function (enteredPassword) {
 	return await bcrypt.compare(enteredPassword, this.password);
 };

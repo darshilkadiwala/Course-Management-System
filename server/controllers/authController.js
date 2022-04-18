@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middlewares/asyncHandler");
 const UserDetailSchema = require("../models/UserDetailSchema.model");
-const InstructorDetailsSchema = require("../models/InstructorDetails.model");
+const InstructorDetailsSchema = require("../models/InstructorDetailSchema.model");
 const ErrorHandler = require("../middlewares/errorHandler");
 const sendEmail = require('../utils/sendEmail');
 
@@ -92,10 +92,13 @@ exports.registerController = asyncHandler(async (req, res, next) => {
 		username,
 		password,
 		gender,
+		role
 	};
-	if (role === "instructor") {
-		user.role = role;
-	}
+	// if (role === "instructor") {
+	// } else if (role === "" || role !== "student" || role === undefined) {
+	// 	statusCode = 400;
+	// 	return next(new ErrorResponse(statusCode, `User role type is invalid`));
+	// }
 
 	const userModel = await UserDetailSchema.create(user);
 	if (!userModel) {
@@ -143,7 +146,6 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 	let userModel = UserDetailSchema.findById(req.user.id, usersProjection);
 	if (req.query.select) {
 		const fields = req.query.select.split(",").join(" ");
-		console.log(fields);
 		userModel = userModel.select(fields);
 	}
 	const user = await userModel;
@@ -184,15 +186,12 @@ exports.forgotPasswordController = asyncHandler(async (req, res, next) => {
 			subject: 'Password reset token',
 			message
 		});
-		// console.log(isMailSent);
-		// if (isMailSent) {
 		await userModel.save({ validateBeforeSave: false })
 		res.status(statusCode).json({
 			success: true,
 			statusCode: statusCode,
 			message: 'Email has been sent to your email address'
 		});
-		// }
 	} catch (error) {
 		userModel.resetPasswordToken = undefined;
 		userModel.resetPasswordExpire = undefined;
@@ -280,6 +279,7 @@ exports.updateProfilePhotoController = asyncHandler(async (req, res, next) => {
 	}
 	//#endregion
 	const photoFile = req.files.profile;
+	console.log(photoFile);
 
 	//#region  checking file mimetype and size
 	if (!photoFile.mimetype.startsWith('image')) {
@@ -287,12 +287,12 @@ exports.updateProfilePhotoController = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(statusCode, "Please upload only an image file"));
 	}
 
-	if (photoFile.size > process.env.FILE_UPLOAD_MAX_SIZE_PROFILE_PHOTO_1MB * 2) {
+	if (photoFile.size > process.env.FILE_UPLOAD_MAX_SIZE_1MB * 2) {
 
 		statusCode = 400;
 		return next(new ErrorResponse(
 			statusCode,
-			`Please upload an image file with size of less than ${(process.env.FILE_UPLOAD_MAX_SIZE_PROFILE_PHOTO_1MB / 1024 / 1024) * 2} MB`));
+			`Please upload an image file with size of less than ${(process.env.FILE_UPLOAD_MAX_PHOTO_1MB / 1024 / 1024) * 2} MB`));
 	}
 	//#endregion
 
@@ -300,7 +300,7 @@ exports.updateProfilePhotoController = asyncHandler(async (req, res, next) => {
 	photoFile.name = `profile_${req.user.id}_${Date.now()}${path.parse(photoFile.name).ext}`;
 	photoFile.mv(`${process.env.FILE_UPLOAD_PATH_PROFILE_PHOTO}/${photoFile.name}`, async (err) => {
 		if (err) {
-			console.log(err);
+			statusCode = 500;
 			return next(new ErrorResponse(statusCode, `Problem with file upload`));
 		}
 		const userModel = await UserDetailSchema.findByIdAndUpdate(req.user.id, { profilePicture: photoFile.name });
@@ -309,7 +309,7 @@ exports.updateProfilePhotoController = asyncHandler(async (req, res, next) => {
 			return next(new ErrorResponse(statusCode, `Can't update details...`));
 		}
 		const oldfile = req.user.profilePicture;
-		console.log(oldfile);
+
 		if (oldfile !== "userProfile.png") {
 			fs.unlink(`${process.env.FILE_UPLOAD_PATH_PROFILE_PHOTO}/${oldfile}`, async (err) => {
 				console.log(err);
@@ -340,9 +340,7 @@ exports.changePasswordController = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(400, "Please provide a passwords"));
 	}
 
-
 	const userModel = await UserDetailSchema.findById(req.user.id).select("+password");
-	console.log(userModel.password);
 	if (!userModel) {
 		statusCode = 400;
 		return next(new ErrorResponse(statusCode, `Can't find user`));
@@ -352,8 +350,6 @@ exports.changePasswordController = asyncHandler(async (req, res, next) => {
 	if (!isPassMatched) {
 		statusCode = 400;
 		return next(new ErrorResponse(statusCode, `Invalid password!!!`));
-	} else {
-		console.log(oldPassword);
 	}
 	if (oldPassword === newPassword) {
 		return next(new ErrorResponse(400, "Please enter password which not used in previously"));
