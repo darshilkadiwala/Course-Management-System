@@ -5,7 +5,9 @@ const {
 	getSingleCourseController,
 	updateCourseController,
 	updateCourseStatusController,
-	updateCourseImageController } = require("../controllers/courseController");
+	updateCourseImageController,
+	addNewSectionController,
+	updateCourseSectionController } = require("../controllers/courseController");
 const advancedResult = require("../middlewares/advancedResult");
 const { protect, authorize } = require("../middlewares/authenticationMiddleware");
 const { checkCourseAuth } = require("../middlewares/checkCourseAuth");
@@ -26,5 +28,11 @@ courseRouter.route("/:courseSlug/status")
 
 courseRouter.route("/:courseSlug/updateCourseImage")
 	.put(protect, authorize("instructor"), checkCourseAuth, updateCourseImageController);
+
+courseRouter.route("/:courseSlug/sections")
+	.post(protect, authorize("instructor"), checkCourseAuth, addNewSectionController);
+
+courseRouter.route("/:courseSlug/sections/:sectionNumber")
+	.put(protect, authorize("instructor"), checkCourseAuth, updateCourseSectionController);
 
 module.exports = courseRouter;

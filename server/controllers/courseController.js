@@ -319,16 +319,35 @@ exports.deleteCourseController = asyncHandler(async (req, res, next) => {
 
 //#endregion
 
+//#region Course Section details
 //#region Add new section to course
 /** Add new section to course
 * @param desc      Add new section to course
-* @param route     POST -> /courses/section/
+* @param route     POST -> /courses/:courseSlug/sections/
 * @param access    PRIVATE
 */
 exports.addNewSectionController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
-	console.log(req.body);
-	const courseSectionModel = await CourseSectionDetailSchema.create({});
+	// find if there any section exists for the same course or not
+	const findCourseInSectionModel = await CourseSectionDetailSchema.findOne({ courseId: req.courseModel.id });
+	let courseSectionModel;
+	if (!findCourseInSectionModel) {
+		courseSectionModel = await CourseSectionDetailSchema.create(
+			{
+				courseId: req.courseModel.id,
+				sections: [{ sectionName: req.body.sectionName }]
+			}
+		);
+	}
+	else {
+		const countSectionModel = await CourseSectionDetailSchema.findOne({ courseId: req.courseModel.id });
+		console.log(countSectionModel.sections.length);
+		courseSectionModel = await CourseSectionDetailSchema.findOneAndUpdate(
+			{ courseId: req.courseModel.id },
+			{ $push: { 'sections': { sectionName: req.body.sectionName, sectionNumber: countSectionModel.sections.length + 1 } } },
+			{ new: true, upsert: true }
+		);
+	}
 	if (!courseSectionModel) {
 		statusCode = 400;
 		return next(new ErrorResponse(statusCode, `Can't create new course section`));
@@ -337,7 +356,38 @@ exports.addNewSectionController = asyncHandler(async (req, res, next) => {
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		result: req.body
+		result: courseSectionModel
 	});
 });
 //#endregion
+
+//#region Update course section
+/** Update course section
+* @param desc      Update course section
+* @param route     POST -> /courses/:courseSlug/sections/:sectionNumber
+* @param access    PRIVATE
+*/
+exports.updateCourseSectionController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	// find if there any section exists for the same course or not
+
+	const courseSectionModel = await CourseSectionDetailSchema.findOneAndUpdate(
+		{ courseId: req.courseModel.id, 'sections.sectionNumber': req.params.sectionNumber },
+		{ $set: { 'sections.$.sectionName': req.body.sectionName } },
+		{ new: true, upsert: true }
+	);
+	if (!courseSectionModel) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't find course section`));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		result: courseSectionModel
+	});
+});
+//#endregion
+
+//#endregion
+

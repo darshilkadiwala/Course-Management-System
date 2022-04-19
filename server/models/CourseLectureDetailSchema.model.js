@@ -16,15 +16,10 @@ const CourseLectureDetailsSchema = new mongoose.Schema({
   },
   lectureNotes: {
     type: mongoose.SchemaTypes.String,
-    required: [true, 'Please add lecture notes'],
   },
   lectureMaterial: {
     type: mongoose.SchemaTypes.String,
-    required: [true, 'Please add lecture material'],
   },
 });
 
-module.exports = mongoose.model(
-  'CourseLectureDetails',
-  CourseLectureDetailsSchema
-);
+module.exports = mongoose.model('CourseLectureDetails', CourseLectureDetailsSchema);
