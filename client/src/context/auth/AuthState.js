@@ -3,16 +3,14 @@ import AuthContext from "./authContext";
 
 const AuthState = (props) => {
 	const [authentication, setAuthentication] = useState(false);
-	const [user, setUser] = useState({ name: '' });
+	const [user, setUser] = useState({ role: '', lastName: '', firstName: '', profilePicture: '' });
 
 	const setAuth = (status = false) => {
 		setAuthentication(status);
-		console.log("Log from AuthState (authentication) :", authentication);
 	}
 
 	const setUserDetail = (userDetails) => {
 		setUser(userDetails);
-		console.log("Log from AuthState (user):", user);
 	}
 	return (
 		<AuthContext.Provider value={{ authentication, setAuth, user, setUserDetail }}>

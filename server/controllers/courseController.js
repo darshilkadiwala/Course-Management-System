@@ -4,7 +4,11 @@ const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middlewares/asyncHandler");
 const CourseBasicDetailSchema = require("../models/CourseBasicDetailSchema.model");
 const SubcategoryDetailSchema = require("../models/SubcategorySchema.model");
-const CourseSectionDetailSchema = require("../models/CourseSectionDetailSchema.model");
+const CourseSectionDetailSchema = require("../models/CourseSectionsDetailsSchema.model");
+const CourseLectureDetailSchemaModel = require('../models/CourseLecturesDetailsSchema.model');
+const CourseSectionSchemaModel = require('../models/CourseSectionSchema.model');
+const CourseBasicDetailSchemaModel = require('../models/CourseBasicDetailSchema.model');
+const CourseLectureSchemaModel = require('../models/CourseLectureSchema.model');
 
 //#region Course Basic details
 //#region Get All courses
@@ -316,7 +320,6 @@ exports.deleteCourseController = asyncHandler(async (req, res, next) => {
 	//#endregion
 });
 //#endregion
-
 //#endregion
 
 //#region Course Section details
@@ -330,33 +333,43 @@ exports.addNewSectionController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
 	// find if there any section exists for the same course or not
 	const findCourseInSectionModel = await CourseSectionDetailSchema.findOne({ courseId: req.courseModel.id });
-	let courseSectionModel;
+	const courseSection = await CourseSectionSchemaModel.create({ sectionName: req.body.sectionName });
+	console.log(courseSection);
+	if (!courseSection) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't create new course section`));
+	}
+	//#region pushing section to sections details
+	let courseSectionsDetailModel;
 	if (!findCourseInSectionModel) {
-		courseSectionModel = await CourseSectionDetailSchema.create(
+		courseSectionsDetailModel = await CourseSectionDetailSchema.create(
 			{
 				courseId: req.courseModel.id,
-				sections: [{ sectionName: req.body.sectionName }]
+				sections: [{ section: courseSection.id }]
 			}
 		);
 	}
 	else {
-		const countSectionModel = await CourseSectionDetailSchema.findOne({ courseId: req.courseModel.id });
-		console.log(countSectionModel.sections.length);
-		courseSectionModel = await CourseSectionDetailSchema.findOneAndUpdate(
+		courseSectionsDetailModel = await CourseSectionDetailSchema.findOneAndUpdate(
 			{ courseId: req.courseModel.id },
-			{ $push: { 'sections': { sectionName: req.body.sectionName, sectionNumber: countSectionModel.sections.length + 1 } } },
+			{ $push: { 'sections': { section: courseSection.id } } },
 			{ new: true, upsert: true }
 		);
 	}
-	if (!courseSectionModel) {
+	const countSectionsModel = await CourseSectionDetailSchema.findOne({ courseId: req.courseModel.id });
+	console.log(countSectionsModel.sections);
+	courseSection.sectionNumber = countSectionsModel.sections.length;
+	const section = await courseSection.save();
+	console.log(section);
+	if (!courseSectionsDetailModel) {
 		statusCode = 400;
 		return next(new ErrorResponse(statusCode, `Can't create new course section`));
 	}
-
+	//#endregion
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		result: courseSectionModel
+		result: courseSectionsDetailModel
 	});
 });
 //#endregion
@@ -370,24 +383,243 @@ exports.addNewSectionController = asyncHandler(async (req, res, next) => {
 exports.updateCourseSectionController = asyncHandler(async (req, res, next) => {
 	let statusCode = 200;
 	// find if there any section exists for the same course or not
-
-	const courseSectionModel = await CourseSectionDetailSchema.findOneAndUpdate(
-		{ courseId: req.courseModel.id, 'sections.sectionNumber': req.params.sectionNumber },
-		{ $set: { 'sections.$.sectionName': req.body.sectionName } },
-		{ new: true, upsert: true }
-	);
-	if (!courseSectionModel) {
+	const courseSectionsDetailsModel = await CourseSectionDetailSchema.findOne(
+		{ courseId: req.courseModel.id }
+	).populate({ path: 'sections.section', select: 'sectionName sectionNumber' });
+	let section;
+	for (const key in courseSectionsDetailsModel.sections) {
+		if (Object.hasOwnProperty.call(courseSectionsDetailsModel.sections, key)) {
+			if (courseSectionsDetailsModel.sections[key].section.sectionNumber === parseInt(req.params.sectionNumber)) {
+				section = courseSectionsDetailsModel.sections[key].section;
+				break;
+			}
+		}
+	}
+	const updateCourseSection = await CourseSectionSchemaModel.findByIdAndUpdate(section.id, {
+		sectionName: req.body.sectionName
+	}, { new: true, upsert: true });
+	if (!updateCourseSection) {
 		statusCode = 400;
-		return next(new ErrorResponse(statusCode, `Can't find course section`));
+		return next(new ErrorResponse(statusCode, `Can't update course section`));
 	}
 
 	res.status(statusCode).json({
 		success: true,
 		statusCode: statusCode,
-		result: courseSectionModel
+		msg: 'Course section updated !!!',
+		result: updateCourseSection
 	});
 });
 //#endregion
 
+//#region View all section of a course
+/** View all section of a course
+* @param desc      View all section of a coursef
+* @param route     GET -> /api/v1/courses/:courseSlug/sections
+* @param access    PUBLIC
+*/
+exports.getCourseSectionsController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	const courseModel = await CourseBasicDetailSchemaModel.findOne({
+		slug: req.params.courseSlug
+	});
+	const courseSections = await CourseSectionDetailSchema.findOne({
+		courseId: courseModel.id
+	}).populate({
+		path: 'courseId', populate: {
+			path: 'courseSubcategory', populate: {
+				path: 'category', select: 'categoryName desc'
+			}
+		}
+	}).populate({
+		path: 'sections', populate: { path: 'section', select: 'sectionNumber sectionName' }
+	}).populate({
+		path: 'courseId', populate: { path: 'instructor' }
+	});
+
+	if (!courseSections) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, "Can't find any section for this course"));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		result: courseSections
+	});
+});
+//#endregion
 //#endregion
 
+//#region Add new lecture to course section
+/** Add new lecture to course section
+* @param desc      Add new lecture to course section
+* @param route     POST -> /api/v1/course/:courseSlug/sections/:sectionNumber/lecture
+* @param access    PRIVATE
+*/
+exports.addNewLectureController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	// find if there any section exists for the same course or not
+	const findSectionModel = await CourseSectionDetailSchema.findOne({
+		courseId: req.courseModel.id
+	}).populate('sections.section');
+	let section;
+	for (const key in findSectionModel.sections) {
+		if (Object.hasOwnProperty.call(findSectionModel.sections, key)) {
+			if (findSectionModel.sections[key].section.sectionNumber === parseInt(req.params.sectionNumber)) {
+				section = findSectionModel.sections[key].section;
+				break;
+			}
+		}
+	}
+	const courseLecture = await CourseLectureSchemaModel.create({ lectureName: req.body.lectureName });
+	if (!courseLecture) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't create new course lecture`));
+	}
+
+	//#region pushing section to sections details
+	const findSectionInLectureModel = await CourseLectureDetailSchemaModel.findOne({
+		courseSectionId: section.id
+	})
+	let courseLecturesDetailsModel;
+	if (!findSectionInLectureModel && !section) {
+		courseLecturesDetailsModel = await CourseLectureDetailSchemaModel.create(
+			{
+				courseSectionId: section.id,
+				lectures: [{ lecture: courseLecture.id }]
+			}
+		);
+	}
+	else {
+		courseLecturesDetailsModel = await CourseLectureDetailSchemaModel.findOneAndUpdate(
+			{ courseSectionId: section.id },
+			{ $push: { 'lectures': { lecture: courseLecture.id } } },
+			{ new: true, upsert: true }
+		);
+	}
+	if (!courseLecturesDetailsModel) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't create new course section`));
+	}
+	const countLecturesModel = await CourseLectureDetailSchemaModel.findOne({ courseSectionId: section.id });
+	console.log(countLecturesModel.lectures);
+	courseLecture.lectureNumber = countLecturesModel.lectures.length;
+	const lecture = await courseLecture.save();
+	console.log(section);
+	//#endregion
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		result: lecture
+	});
+});
+//#endregion
+
+//#region Update course lecture
+/** Update course lecture
+* @param desc      Update course lecture
+* @param route     POST -> /courses/:courseSlug/sections/:sectionNumber/lecture/:lectureNumber
+* @param access    PRIVATE
+*/
+exports.updateCourseLectureController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	// find if there any section exists for the same course or not
+	const findSectionModel = await CourseSectionDetailSchema.findOne({
+		courseId: req.courseModel.id
+	}).populate('sections.section');
+	let section;
+	for (const key in findSectionModel.sections) {
+		if (Object.hasOwnProperty.call(findSectionModel.sections, key)) {
+			if (findSectionModel.sections[key].section.sectionNumber === parseInt(req.params.sectionNumber)) {
+				section = findSectionModel.sections[key].section;
+				break;
+			}
+		}
+	}
+	if (!section) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't find section in this course`));
+	}
+	const findLectureModel = await CourseLectureDetailSchemaModel.findOne({
+		courseSectionId: section.id
+	}).populate('lectures.lecture');
+	let lecture;
+	for (const key in findLectureModel.lectures) {
+		if (Object.hasOwnProperty.call(findLectureModel.lectures, key)) {
+			if (findLectureModel.lectures[key].lecture.lectureNumber === parseInt(req.params.lectureNumber)) {
+				lecture = findLectureModel.lectures[key].lecture;
+				break;
+			}
+		}
+	}
+	if (!lecture) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't find lecture in this section`));
+	}
+
+	const updateLectureModel = await CourseLectureSchemaModel.findByIdAndUpdate(lecture.id,
+		{ lectureName: req.body.lectureName },
+		{ new: true, upsert: true }
+	);
+	if (!updateLectureModel) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't update lecture`));
+	}
+
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		msg: 'Lecture updated successfully',
+		result: updateLectureModel
+	});
+});
+//#endregion
+
+//#region View all section of a course
+/** View all section of a course
+* @param desc      View all section of a coursef
+* @param route     GET -> /api/v1/courses/:courseSlug/sections/:sectionNumber/lectures
+* @param access    PUBLIC
+*/
+exports.getLecturesController = asyncHandler(async (req, res, next) => {
+	let statusCode = 200;
+	const courseModel = await CourseBasicDetailSchemaModel.findOne({
+		slug: req.params.courseSlug
+	});
+	const courseSections = await CourseSectionDetailSchema.findOne({
+		courseId: courseModel.id
+	}).populate({
+		path: 'sections', populate: { path: 'section', select: 'sectionNumber sectionName' }
+	});
+
+	if (!courseSections) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, "Can't find any section for this course"));
+	}
+	let section;
+	for (const key in courseSections.sections) {
+		if (Object.hasOwnProperty.call(courseSections.sections, key)) {
+			if (courseSections.sections[key].section.sectionNumber === parseInt(req.params.sectionNumber)) {
+				section = courseSections.sections[key].section;
+				break;
+			}
+		}
+	}
+	if (!section) {
+		statusCode = 400;
+		return next(new ErrorResponse(statusCode, `Can't find section in this course`));
+	}
+	const courseLectures = await CourseLectureDetailSchemaModel.findOne({
+		courseSectionId: section.id
+	}).populate({
+		path: 'lectures', populate: { path: 'lecture', select: 'lectureNumber lectureName' }
+	});
+	res.status(statusCode).json({
+		success: true,
+		statusCode: statusCode,
+		result: courseLectures.lectures
+	});
+});
+//#endregion

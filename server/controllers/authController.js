@@ -35,7 +35,12 @@ exports.loginController = asyncHandler(async (req, res, next) => {
 		statusCode = 401;
 		return next(new ErrorResponse(statusCode, `Invalid username or password!!!`));
 	}
-	sendTokenResponse(userModel, statusCode, res, userModel.role);
+	sendTokenResponse(userModel, statusCode, res, {
+		role: userModel.role,
+		lastName: userModel.lastName,
+		firstName: userModel.firstName,
+		profilePicture: userModel.profilePicture
+	});
 	// const token = userModel.getSignedJWTToken();
 	// res.status(statusCode).json({
 	// 	success: true,
@@ -119,7 +124,7 @@ exports.registerController = asyncHandler(async (req, res, next) => {
 		}
 	}
 	const msg = "Registration done successfully !!!";
-	sendTokenResponse(userModel, statusCode, res, msg);
+	sendTokenResponse(userModel, statusCode, res, null, msg);
 	// const token = userModel.getSignedJWTToken();
 	// res.status(statusCode).json({
 	// 	success: true,
@@ -292,7 +297,7 @@ exports.updateProfilePhotoController = asyncHandler(async (req, res, next) => {
 		statusCode = 400;
 		return next(new ErrorResponse(
 			statusCode,
-			`Please upload an image file with size of less than ${(process.env.FILE_UPLOAD_MAX_PHOTO_1MB / 1024 / 1024) * 2} MB`));
+			`Please upload an image file with size of less than ${(process.env.FILE_UPLOAD_MAX_SIZE_1MB / 1024 / 1024) * 2} MB`));
 	}
 	//#endregion
 
@@ -365,7 +370,7 @@ exports.changePasswordController = asyncHandler(async (req, res, next) => {
 //#endregion
 
 //#region Sending response with token as cookie
-const sendTokenResponse = (userModel, statusCode, res, msg) => {
+const sendTokenResponse = (userModel, statusCode, res, data, msg) => {
 	const token = userModel.getSignedJWTToken();
 	const options = {
 		expires: new Date(
@@ -380,6 +385,7 @@ const sendTokenResponse = (userModel, statusCode, res, msg) => {
 	res.status(statusCode).cookie("token", token, options).json({
 		success: true,
 		statusCode: statusCode,
+		data,
 		msg,
 		token,
 	}).send();

@@ -1,0 +1,11 @@
+.placeholder {
+	color: gray;
+}
+
+.form-control:focus + .placeholder {
+	color: darkblue;
+}
+
+.bg-offWhite {
+	background-color: var(--white-color);
+}

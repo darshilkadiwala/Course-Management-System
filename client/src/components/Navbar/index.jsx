@@ -15,7 +15,7 @@ import AuthContext from '../../context/auth/authContext';
 function Navbar(props) {
 	const navigateTo = useNavigate();
 	//using AuthContext to check authentication state
-	const { authentication, setAuth } = useContext(AuthContext);
+	const { authentication, setAuth, user, setUserDetail } = useContext(AuthContext);
 
 	const [isOpenDrawer, setIsOpenDrawer] = useState(false);
 	const [isOpenSearchForm, setIsOpenSearchForm] = useState(false);
@@ -27,7 +27,6 @@ function Navbar(props) {
 		setIsOpenSearchForm(!isOpenSearchForm);
 	};
 
-	// console.log('Log from logoutUser :', authentication);
 	const logoutUser = () => {
 		localStorage.clear();
 		setAuth(false);
@@ -52,26 +51,32 @@ function Navbar(props) {
 				)}
 				<NavBarBrand title={props.title} logo={<Logo className='nav-logo-icon' />} />
 				<NavBarItems cssClass={`nav-items ${isOpenDrawer ? 'active' : ''}`}>
-					<NavBarItems cssClass='left-items'>
+					{/* <NavBarItems cssClass='left-items'>
 						<NavBarLinkItem toLink='/about' linkText='About' />
 						<NavBarLinkItem toLink='/blogs' linkText='Blogs' />
 						<NavBarLinkItem toLink='/feedback' linkText='Feedback' />
-					</NavBarItems>
+					</NavBarItems> */}
 					<NavBarItems cssClass='right-items'>
 						<NavBarSearchForm cssClass={isOpenSearchForm ? 'active' : ''} />
 						{!authentication ? (
 							<>
 								<NavBarLinkItem toLink='/register' linkText='Register' />
-								<NavBarLinkItem toLink='/login' linkText='Login' cssClass='login' />
+								<NavBarLinkItem
+									toLink='/login'
+									linkText='Login'
+									cssClass='btn login'
+								/>
 							</>
 						) : (
 							<>
-								<button onClick={logoutUser} className='login btn btn-success'>
+								<NavBarLinkItem
+									toLink='/change-password'
+									linkText='Change password'
+									cssClass='login'
+								/>
+								<button onClick={logoutUser} className='login btn btn-success ml-3'>
 									Logout
 								</button>
-								<a className='login' href='/'>
-									Hello
-								</a>
 							</>
 						)}
 					</NavBarItems>

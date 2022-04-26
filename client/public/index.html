@@ -11,23 +11,46 @@
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;700;900&display=swap"
-    rel="stylesheet" />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&family=Montserrat:wght@200;300;400;500;600;700;800;900&family=Source+Sans+Pro:wght@200;300;400;700;900&family=Roboto+Slab:wght@200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
     integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
   <title>Course Management System</title>
   <style>
     * {
-      font-family: 'Source Sans Pro', sans-serif;
+      font-family: 'Roboto Slab', serif;
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Tinos', serif;
+      font-weight: 700;
+    }
+
+    .btn,
+    button,
+    .button,
+    input[type=submit],
+    input[type=reset] {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
     }
 
     :root {
@@ -36,8 +59,24 @@
       --white-color: #EDEDED;
     }
 
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
     .vh-100 {
       height: 100vh !important;
+    }
+
+    img.profilePicture {
+      max-width: 500px;
+      width: 100px;
     }
   </style>
 </head>
@@ -45,6 +84,39 @@
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
+  <!-- <script>
+    const showPassword = document.querySelector("#show_hide_password"),
+      txtPassword = showPassword.querySelector("input[type=password][name=password]#password"),
+      showPassword_icon = showPassword.querySelector("input-group-addon i");
+    if (showPassword != null) {
+      showPassword.onclick = (textField, icon) => {
+        if (textField.type == "password") {
+          textField.type = "text";
+          icon.classList.add("fa-eye-slash");
+          icon.classList.remove("fa-eye");
+        } else {
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+          textField.type = "password";
+        }
+        // txtPasswd.focus();
+      }
+    }
+    $(document).ready(function () {
+      $("#show_hide_password a").on('click', function (event) {
+        event.preventDefault();
+        if ($('#show_hide_password input').attr("type") == "text") {
+          $('#show_hide_password input').attr('type', 'password');
+          $('#show_hide_password i').addClass("fa-eye-slash");
+          $('#show_hide_password i').removeClass("fa-eye");
+        } else if ($('#show_hide_password input').attr("type") == "password") {
+          $('#show_hide_password input').attr('type', 'text');
+          $('#show_hide_password i').removeClass("fa-eye-slash");
+          $('#show_hide_password i').addClass("fa-eye");
+        }
+      });
+    });
+  </script> -->
 </body>
 
 </html>
