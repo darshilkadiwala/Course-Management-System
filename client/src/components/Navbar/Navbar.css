@@ -74,8 +74,9 @@ nav .nav-items .right-items {
 }
 nav .nav-items li {
 	list-style: none;
-	padding: 0.3rem 1rem;
+	padding-left: 0.7rem;
 }
+nav .nav-items li span,
 nav .nav-items li a {
 	color: #fff;
 	font-size: 1.15rem;
@@ -138,7 +139,7 @@ nav .nav-items .login {
 	line-height: 36px;
 	font-size: 16px;
 	vertical-align: top;
-	border-radius: 50px;
+	border-radius: 10px;
 	font-weight: 600;
 	text-align: center;
 	background: transparent;
@@ -150,6 +151,7 @@ nav .login:focus {
 }
 nav .login:hover {
 	border-color: var(--second-color);
+	color: var(--second-color);
 }
 
 @media (max-width: 1245px) {

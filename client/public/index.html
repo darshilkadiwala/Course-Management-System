@@ -49,8 +49,15 @@
     .button,
     input[type=submit],
     input[type=reset] {
-      font-family: 'Montserrat', sans-serif;
       font-weight: 500;
+      letter-spacing: .5px;
+      outline: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .btnWithBG:hover {
+      background-color: var(--second-color);
+      color: var(--first-color) !important;
     }
 
     :root {
@@ -77,6 +84,18 @@
     img.profilePicture {
       max-width: 500px;
       width: 100px;
+    }
+
+    .placeholder {
+      color: rgb(72, 69, 69);
+    }
+
+    .form-control:focus+.placeholder {
+      color: black;
+    }
+
+    .bg-offWhite {
+      background-color: var(--white-color);
     }
   </style>
 </head>

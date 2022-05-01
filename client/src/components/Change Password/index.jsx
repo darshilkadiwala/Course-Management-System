@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import './index.css';
 import AuthContext from '../../context/auth/authContext';
 
 export function ChangePassword(props) {

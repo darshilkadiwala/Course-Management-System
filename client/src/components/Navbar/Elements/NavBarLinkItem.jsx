@@ -9,6 +9,11 @@ export function NavBarLinkItem(props) {
 					{props.linkText}
 				</Link>
 			)}
+			{!props.toLink && (
+				<span className={props.cssClass} onClick={props.onClick}>
+					{props.linkText}
+				</span>
+			)}
 		</li>
 	);
 }

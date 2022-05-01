@@ -81,7 +81,7 @@ export function Login(props) {
 							</div>
 						</div>
 						{error && <div className={styles.error_msg}>{error}</div>}
-						<div className='row d-flex align-content-center'>
+						<div className='row d-flex justify-content-center'>
 							<button type='submit' className={`button ${styles.green_btn}`}>
 								Login
 							</button>

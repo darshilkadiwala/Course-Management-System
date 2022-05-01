@@ -60,7 +60,11 @@ function Navbar(props) {
 						<NavBarSearchForm cssClass={isOpenSearchForm ? 'active' : ''} />
 						{!authentication ? (
 							<>
-								<NavBarLinkItem toLink='/register' linkText='Register' />
+								<NavBarLinkItem
+									toLink='/register'
+									linkText='Register'
+									cssClass='btnWithBG btn'
+								/>
 								<NavBarLinkItem
 									toLink='/login'
 									linkText='Login'
@@ -74,9 +78,11 @@ function Navbar(props) {
 									linkText='Change password'
 									cssClass='login'
 								/>
-								<button onClick={logoutUser} className='login btn btn-success ml-3'>
-									Logout
-								</button>
+								<NavBarLinkItem
+									onClick={logoutUser}
+									cssClass='ml-3 login'
+									linkText='Logout'
+								/>
 							</>
 						)}
 					</NavBarItems>
