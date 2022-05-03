@@ -12,7 +12,7 @@ import { NavBarSearchForm } from "./Elements/NavBarSearchForm";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/auth/authContext";
 
-function MainNavbar(props) {
+function Navbar(props) {
 	const navigateTo = useNavigate();
 	//using AuthContext to check authentication state
 	const { authentication, setAuth, user, setUserDetail } =
@@ -50,10 +50,7 @@ function MainNavbar(props) {
 						onClick={toggleOpenDrawer}
 					/>
 				)}
-				<NavBarBrand
-					title={props.title}
-					logo={<Logo className="nav-logo-icon" />}
-				/>
+				<NavBarBrand title={props.title} />
 				<NavBarItems cssClass={`nav-items ${isOpenDrawer ? "active" : ""}`}>
 					{/* <NavBarItems cssClass='left-items'>
 						<NavBarLinkItem toLink='/about' linkText='About' />
@@ -62,33 +59,11 @@ function MainNavbar(props) {
 					</NavBarItems> */}
 					<NavBarItems cssClass="right-items">
 						<NavBarSearchForm cssClass={isOpenSearchForm ? "active" : ""} />
-						{!authentication ? (
-							<>
-								<NavBarLinkItem
+						{/* <NavBarLinkItem
 									toLink="/register"
 									linkText="Register"
 									cssClass="btnWithBG btn"
-								/>
-								<NavBarLinkItem
-									toLink="/login"
-									linkText="Login"
-									cssClass="btn login"
-								/>
-							</>
-						) : (
-							<>
-								<NavBarLinkItem
-									toLink="/change-password"
-									linkText="Change password"
-									cssClass="login"
-								/>
-								<NavBarLinkItem
-									onClick={logoutUser}
-									cssClass="ml-3 login"
-									linkText="Logout"
-								/>
-							</>
-						)}
+								/> */}
 					</NavBarItems>
 				</NavBarItems>
 
@@ -109,10 +84,10 @@ function MainNavbar(props) {
 		</>
 	);
 }
-MainNavbar.propTypes = {
+Navbar.propTypes = {
 	title: PropTypes.string,
 };
-MainNavbar.defaultProps = {
-	title: "Course Management",
+Navbar.defaultProps = {
+	title: "Admin Dashboard",
 };
-export default MainNavbar;
+export default Navbar;

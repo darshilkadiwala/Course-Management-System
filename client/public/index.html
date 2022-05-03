@@ -1,109 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Web site created using create-react-app" />
-  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#000000" />
+		<meta name="description" content="Web site created using create-react-app" />
+		<link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+		<link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&family=Montserrat:wght@200;300;400;500;600;700;800;900&family=Source+Sans+Pro:wght@200;300;400;700;900&family=Roboto+Slab:wght@200;300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+		<link
+			href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&family=Montserrat:wght@200;300;400;500;600;700;800;900&family=Source+Sans+Pro:wght@200;300;400;700;900&family=Roboto+Slab:wght@200;300;400;500;600;700;800;900&display=swap"
+			rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-    integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+			integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+			crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
-  <title>Course Management System</title>
-  <style>
-    * {
-      font-family: 'Roboto Slab', serif;
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+			integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+			crossorigin="anonymous"></script>
+		<title>Course Management System</title>
+		<style>
+			* {
+				font-family: 'Roboto Slab', serif;
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      font-family: 'Tinos', serif;
-      font-weight: 700;
-    }
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				font-family: 'Tinos', serif;
+				font-weight: 700;
+			}
 
-    .btn,
-    button,
-    .button,
-    input[type=submit],
-    input[type=reset] {
-      font-weight: 500;
-      letter-spacing: .5px;
-      outline: 0 !important;
-      box-shadow: none !important;
-    }
+			.btn,
+			button,
+			.button,
+			input[type=submit],
+			input[type=reset] {
+				font-weight: 500;
+				letter-spacing: .5px;
+				outline: 0 !important;
+				box-shadow: none !important;
+			}
 
-    .btnWithBG:hover {
-      background-color: var(--second-color);
-      color: var(--first-color) !important;
-    }
+			.btnWithBG:hover {
+				background-color: var(--second-color);
+				color: var(--first-color) !important;
+			}
 
-    :root {
-      --first-color: #171C24;
-      --second-color: #f5A623;
-      --white-color: #EDEDED;
-    }
+			:root {
+				--first-color: #171C24;
+				--second-color: #f5A623;
+				--white-color: #EDEDED;
+			}
 
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+			input::-webkit-outer-spin-button,
+			input::-webkit-inner-spin-button {
+				-webkit-appearance: none;
+				margin: 0;
+			}
 
-    /* Firefox */
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
+			input[type=number] {
+				-moz-appearance: textfield;
+			}
 
-    .vh-100 {
-      height: 100vh !important;
-    }
+			.vh-100 {
+				height: 100vh !important;
+			}
 
-    img.profilePicture {
-      max-width: 500px;
-      width: 100px;
-    }
+			img.profilePicture {
+				max-width: 500px;
+				width: 100px;
+			}
 
-    .placeholder {
-      color: rgb(72, 69, 69);
-    }
+			.placeholder {
+				color: rgb(72, 69, 69);
+			}
 
-    .form-control:focus+.placeholder {
-      color: black;
-    }
+			.form-control:focus+.placeholder {
+				color: black;
+			}
 
-    .bg-offWhite {
-      background-color: var(--white-color);
-    }
-  </style>
-</head>
+			.bg-offWhite {
+				background-color: var(--white-color);
+			}
+		</style>
+	</head>
 
-<body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root"></div>
-  <!-- <script>
+	<body>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="root"></div>
+		<!-- <script>
     const showPassword = document.querySelector("#show_hide_password"),
       txtPassword = showPassword.querySelector("input[type=password][name=password]#password"),
       showPassword_icon = showPassword.querySelector("input-group-addon i");
@@ -136,6 +135,6 @@
       });
     });
   </script> -->
-</body>
+	</body>
 
 </html>
