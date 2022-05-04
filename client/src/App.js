@@ -15,6 +15,13 @@ import Footer from "./components/Footer";
 export default function App() {
 	const { setAuth, user, setUserDetail } = useContext(AuthContext);
 	const { alert, showAlert } = useContext(AlertContext);
+	
+	const [categories, setStateCategories] = useState([]);
+	const setCategories = (data) => {
+		// console.log(Object.keys(...data));
+		setStateCategories(data);
+	};
+
 	let user1;
 	const getLoggedInUser = async () => {
 		const token = localStorage.getItem("loginToken");
@@ -43,10 +50,22 @@ export default function App() {
 		// setUserDetail(JSON.parse(localStorage.getItem('loggedUser')));
 		user1 = JSON.parse(localStorage.getItem("loggedUser"));
 	}
+
+	const loadCategories = async () => {
+		try {
+			const url = "http://localhost:5000/api/v1/category?populate=true";
+			const { data: res } = await axios.get(url);
+			setCategories(res.data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	categories.length === 0 && loadCategories();
+
 	return (
 		<>
-			<MainNavbar />
-			<Navbar />
+			<MainNavbar title="CMS" categories={categories}/>
+			{/* <Navbar /> */}
 			<Alert alert={alert} />
 			<Routes>
 				<Route
@@ -93,13 +112,13 @@ export default function App() {
 				<Route
 					path="*"
 					element={
-						<main main style={{ padding: "1rem" }}>
+						<main style={{ padding: "1rem" }}>
 							<p>There's nothing here!</p>
 						</main>
 					}
 				/>
 			</Routes>
-			<Footer/>
+			<Footer categories={categories}/>
 		</>
 	);
 }

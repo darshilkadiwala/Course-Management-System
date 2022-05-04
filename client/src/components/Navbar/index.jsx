@@ -9,8 +9,9 @@ import { NavBarIconItem } from "./Elements/NavBarIconItem";
 import { NavBarItems } from "./Elements/NavBarItems";
 import { NavBarLinkItem } from "./Elements/NavBarLinkItem";
 import { NavBarSearchForm } from "./Elements/NavBarSearchForm";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../context/auth/authContext";
+import NavbarDropdownItem from "./Elements/NavbarDropdownItem";
 
 function MainNavbar(props) {
 	const navigateTo = useNavigate();
@@ -55,11 +56,54 @@ function MainNavbar(props) {
 					logo={<Logo className="nav-logo-icon" />}
 				/>
 				<NavBarItems cssClass={`nav-items ${isOpenDrawer ? "active" : ""}`}>
-					{/* <NavBarItems cssClass='left-items'>
-						<NavBarLinkItem toLink='/about' linkText='About' />
+					<NavBarItems cssClass="left-items">
+						<li className="dropdown">
+							<span
+								// to="/category"
+								className="dropdown-toggle"
+								data-toggle="dropdown"
+							>
+								Category<b className="caret"></b>
+							</span>
+							<NavbarDropdownItem cssListClass="dropdown-menu" listType="ul">
+								{props.categories.map((category) => (
+									<NavbarDropdownItem
+										listType="li"
+										cssListClass="dropdown-submenu"
+										linkText={category.categoryName}
+										cssLinkClass="dropdown-toggle"
+										toLink={"courses/" + category.slug}
+										key={category.slug}
+									>
+										{category.subcategories.length >0 && (
+											<NavbarDropdownItem
+												cssListClass="dropdown-menu"
+												listType="ul"
+											>
+												{category.subcategories.map((subCategory) => (
+													<>
+														<NavBarLinkItem
+															toLink={
+																"courses/" +
+																category.slug +
+																"/" +
+																subCategory.slug
+															}
+															key={subCategory.slug}
+															linkText={subCategory.subcategoryName}
+														/>
+													</>
+												))}
+											</NavbarDropdownItem>
+										)}
+									</NavbarDropdownItem>
+								))}
+							</NavbarDropdownItem>
+						</li>
+						{/* <NavBarLinkItem toLink='/about' linkText='About' />
 						<NavBarLinkItem toLink='/blogs' linkText='Blogs' />
-						<NavBarLinkItem toLink='/feedback' linkText='Feedback' />
-					</NavBarItems> */}
+						<NavBarLinkItem toLink='/feedback' linkText='Feedback' /> */}
+					</NavBarItems>
 					<NavBarItems cssClass="right-items">
 						<NavBarSearchForm cssClass={isOpenSearchForm ? "active" : ""} />
 						{!authentication ? (
@@ -111,8 +155,10 @@ function MainNavbar(props) {
 }
 MainNavbar.propTypes = {
 	title: PropTypes.string,
+	categories: PropTypes.array,
 };
 MainNavbar.defaultProps = {
 	title: "Course Management",
+	categories: [],
 };
 export default MainNavbar;

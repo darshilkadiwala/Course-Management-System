@@ -1,18 +1,19 @@
-import axios from "axios";
-import React, { useState } from "react";
+import PropTypes from "prop-types";
+import React from "react";
+import FooterLinkGroup from "./FooterLinkGroup";
 
 export function FooterWrapper(props) {
-	const [categories, setCategories] = useState({});
-	const loadCategories = async () => {
-		try {
-			const url = "http://localhost:5000/api/v1/category?populate=true";
-			const { data: res } = await axios.get(url);
-			setCategories(res);
-			console.log(res);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-	loadCategories();
-	return <div>HELLO</div>;
+	return (
+		<div className="footer-wrapper mx-5 p-4">
+			{props.categories.map((category) => (
+				<FooterLinkGroup key={category.slug} linkGroup={category} />
+			))}
+		</div>
+	);
 }
+FooterWrapper.propTypes = {
+	categories: PropTypes.array,
+};
+FooterWrapper.defaultProps = {
+	categories: [],
+};

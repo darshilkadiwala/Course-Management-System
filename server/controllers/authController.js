@@ -125,13 +125,6 @@ exports.registerController = asyncHandler(async (req, res, next) => {
 	}
 	const msg = "Registration done successfully !!!";
 	sendTokenResponse(userModel, statusCode, res, null, msg);
-	// const token = userModel.getSignedJWTToken();
-	// res.status(statusCode).json({
-	// 	success: true,
-	// 	statusCode: statusCode,
-	// 	msg: "Registration done successfully !!!",
-	// 	token,
-	// });
 });
 //#endregion
 

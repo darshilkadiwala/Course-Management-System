@@ -191,7 +191,7 @@ exports.getAllSubcategoryByCategoryController = asyncHandler(
 		});
 		res.status(res.advancedResult.statusCode).json({
 			success: true,
-			msg: `All subcategory for category : ${req.params.categoryNameSlug}`,
+			msg: `All subcategory`,
 			// msg: `All subcategory for category : ${req.params.categoryNameSlug}`,
 			...res.advancedResult,
 		});

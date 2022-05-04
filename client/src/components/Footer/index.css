@@ -1,6 +1,66 @@
-.footer-wrapper {
+footer,
+.footer {
+	background: var(--first-color);
+}
+footer .navbar-brand *,
+.footer .navbar-brand * {
+	font-family: "Montserrat", sans-serif;
+}
+
+.footer .footer-wrapper,
+.footer .footer-strip {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: row;
-	justify-content: space-around;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+.footer-link-group {
+	color: var(--white-color);
+	min-width: 200px;
+	padding: 1.25rem 1rem;
+	margin: 0 auto;
+}
+.footer-link-group li {
+	list-style: none;
+}
+.footer-link-group li a.footer-link {
+	text-decoration: none;
+	position: relative;
+	color: var(--white-color);
+	padding: 0 0.5rem;
+	transition: 0.3s;
+}
+.footer-link-group > .footer-link-group-header > li > a {
+	font-weight: 600;
+	font-size: 1.35rem;
+}
+
+.footer-link-group > li > a.footer-link:hover::after {
+	width: 100%;
+}
+.footer .footer-social-icon {
+	transition: 0.3s;
+	/* border-radius: 50%; */
+	padding: 0.1rem 0.5rem;
+}
+.footer .footer-strip {
+	border-top: 1px solid var(--white-color);
+	border-image: linear-gradient(
+		to right,
+		rgba(255, 255, 255, 0) 5%,
+		rgba(255, 255, 255, 1) 5%,
+		rgba(255, 255, 255, 1) 95%,
+		rgba(255, 255, 255, 0) 95%
+	);
+	border-image-slice: 1;
+	
+}
+.footer .footer-strip .footer-social-icon-group {
+	margin: auto 0;
+}
+.footer .footer-strip .footer-social-icon-group .footer-social-icon:hover {
+	transform: scale(1.2);
+	color: var(--first-color) !important;
+	background-color: wheat;
 }
